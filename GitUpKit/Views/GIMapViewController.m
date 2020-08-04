@@ -728,7 +728,7 @@ typedef NS_ENUM(NSInteger, GIGitFlowAction) {
       i.hidden = YES;
       return NO;
     }
-    GIGitFlowAction action;
+    GIGitFlowAction action = GIGitFlowActionFeature;
     BOOL isSuccess = NO;
     for (GCLocalBranch *branch in commit.localBranches) {
       GCHistoryLocalBranch *currentBranch = [self.repository.history historyLocalBranchForLocalBranch:branch];
