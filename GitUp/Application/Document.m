@@ -2165,10 +2165,14 @@ static NSString* _StringFromRepositoryState(GCRepositoryState state) {
 - (IBAction)openGitFlowMenu:(id)sender {}
 
 - (IBAction)gitFlowInitialize:(id)sender {
-  [NSApp beginSheet:_gitFlowInitWindow modalForWindow:_mainWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+  //[NSApp beginSheet:_gitFlowInitWindow modalForWindow:_mainWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+  [_mainWindow beginSheet:_gitFlowInitWindow completionHandler:^(NSModalResponse returnCode){
+  }];
 }
+   
+   
 - (IBAction)gitFlowDoneInit:(id)sender {
-  [NSApp endSheet:_gitFlowInitWindow];
+  //[NSApp endSheet:_gitFlowInitWindow];
   [_gitFlowInitWindow orderOut:nil];
   
   NSString *masterBranchName = self.gitFlowInitWindow.masterBranchField.stringValue;
@@ -2205,16 +2209,12 @@ static NSString* _StringFromRepositoryState(GCRepositoryState state) {
     [_windowController showOverlayWithStyle:kGIOverlayStyle_Informational message:NSLocalizedString(message, nil)];
     return;
   }
-  if (![_mapViewController createLocalBranchAtCommit:commit withName:masterBranchName checkOut:YES error:&error]) {
-    if (error.code != -4) { [self presentError:error]; }// Sorry for the magic -4 number. -4 is error code when branch exists already. 
-  }
-  if (![_mapViewController createLocalBranchAtCommit:commit withName:developBranchName checkOut:YES error:&error]) {
-    if (error.code != -4) { [self presentError:error]; }
-  }
+  [_mapViewController createLocalBranchAtCommit:commit withName:masterBranchName checkOut:TRUE];
+  [_mapViewController createLocalBranchAtCommit:commit withName:developBranchName checkOut:TRUE];
 }
 
 - (IBAction)gitFlowCancelInit:(id)sender {
-  [NSApp endSheet:_gitFlowInitWindow];
+  //[NSApp endSheet:_gitFlowInitWindow];
   [_gitFlowInitWindow orderOut:nil];
 }
 
