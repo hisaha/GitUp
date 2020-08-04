@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #import "GICommitListViewController.h"
 
+#import "GCLiveRepository+Utilities.h"
 #import "GIInterface.h"
 #import "XLFacilityMacros.h"
 
@@ -241,6 +242,15 @@
 - (void)tableViewSelectionDidChange:(NSNotification*)notification {
   if ([_delegate respondsToSelector:@selector(commitListViewControllerDidChangeSelection:)]) {
     [_delegate commitListViewControllerDidChangeSelection:self];
+  }
+}
+
+- (void)keyDown:(NSEvent*)event {
+  if (event.keyCode == kGIKeyCode_Return) {
+    GCHistoryCommit* commit = [self selectedCommit];
+    [self.repository smartCheckoutCommit:commit window:self.view.window];
+  } else {
+    [super keyDown:event];
   }
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ static int _GitLFSApply(git_filter* self, void** payload, git_buf* to, const git
       [arguments addObject:@"--"];
       [arguments addObject:GCFileSystemPathFromGitPath(git_filter_source_path(src))];
       GCTask* task = [[GCTask alloc] initWithExecutablePath:[NSString stringWithUTF8String:_GitLFSPath]];
-      task.currentDirectoryPath = _MakeDirectoryPath(git_repository_path(git_filter_source_repo(src)));  // TODO: Is this the right working directory?
+      task.currentDirectoryPath = _MakeDirectoryPath(git_repository_workdir(git_filter_source_repo(src)));
       int status;
       NSData* stdinData = [[NSData alloc] initWithBytesNoCopy:from->ptr length:from->size freeWhenDone:NO];
       NSData* stdoutData;
@@ -120,7 +120,6 @@ static int _GitLFSApply(git_filter* self, void** payload, git_buf* to, const git
   assert(git_libgit2_features() & GIT_FEATURE_SSH);
   assert(git_libgit2_init() >= 1);
   assert(libssh2_init(0) == 0);  // We can't have libgit2 using libssh2_session_init() and in turn calling this function on an arbitrary thread later on
-  assert(git_openssl_set_locking() == -1);
 
 #if !TARGET_OS_IPHONE
   struct stat info;
@@ -136,21 +135,15 @@ static int _GitLFSApply(git_filter* self, void** payload, git_buf* to, const git
 
 - (instancetype)initWithRepository:(git_repository*)repository error:(NSError**)error {
   if ((self = [super init])) {
-    [self updateRepository:repository];
+    _private = repository;
+    _repositoryPath = _MakeDirectoryPath(git_repository_path(_private));
+    _workingDirectoryPath = _MakeDirectoryPath(git_repository_workdir(_private));
   }
   return self;
 }
 
 - (void)dealloc {
   git_repository_free(_private);
-}
-
-// TODO: Should we really have this method? There might still be a bunch of libgit2 objects around that refer to the old git_repository*
-- (void)updateRepository:(git_repository*)repository {
-  git_repository_free(_private);
-  _private = repository;
-  _repositoryPath = _MakeDirectoryPath(git_repository_path(_private));
-  _workingDirectoryPath = _MakeDirectoryPath(git_repository_workdir(_private));
 }
 
 - (NSString*)description {
@@ -334,7 +327,7 @@ static int _ReferenceForEachCallback(const char* refname, void* payload) {
     CFAbsoluteTime time = CFAbsoluteTimeGetCurrent();
     GCTask* task = [[GCTask alloc] initWithExecutablePath:path];
     task.currentDirectoryPath = self.workingDirectoryPath;  // TODO: Is this the right working directory?
-    task.additionalEnvironment = @{ @"PATH" : cachedPATH };
+    task.additionalEnvironment = @{@"PATH" : cachedPATH};
     int status;
     NSData* stdoutData;
     NSData* stderrData;
@@ -509,14 +502,14 @@ static int _CredentialsCallback(git_cred** cred, const char* url, const char* us
         success = [repository.delegate repository:repository
             requiresPlainTextAuthenticationForURL:GCURLFromGitURL([NSString stringWithUTF8String:url])
                                              user:(user ? [NSString stringWithUTF8String:user] : nil)
-                                         username:&username
+                                             username:&username
                                          password:&password];
       } else {
         dispatch_sync(dispatch_get_main_queue(), ^{
           success = [repository.delegate repository:repository
               requiresPlainTextAuthenticationForURL:GCURLFromGitURL([NSString stringWithUTF8String:url])
                                                user:(user ? [NSString stringWithUTF8String:user] : nil)
-                                           username:&username
+                                               username:&username
                                            password:&password];
         });
       }

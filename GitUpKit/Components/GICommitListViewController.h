@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,10 +23,10 @@
 @end
 
 @interface GICommitListViewController : GIViewController
-@property(nonatomic, assign) id<GICommitListViewControllerDelegate> delegate;
+@property(nonatomic, weak) id<GICommitListViewControllerDelegate> delegate;
 @property(nonatomic, copy) NSArray* results;  // Can contain GCHistoryCommit, GCHistoryLocalBranch, GCHistoryRemoteBranch or GCHistoryTag
 @property(nonatomic, readonly) NSArray* commits;  // Converted results to GCHistoryCommits
-@property(nonatomic, assign) id selectedResult;
-@property(nonatomic, assign) GCHistoryCommit* selectedCommit;
+@property(nonatomic, weak) id selectedResult;
+@property(nonatomic, weak) GCHistoryCommit* selectedCommit;
 @property(nonatomic, copy) NSString* emptyLabel;
 @end

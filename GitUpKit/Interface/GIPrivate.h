@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,27 +16,9 @@
 #import "GIInterface.h"
 
 #import "XLFacilityMacros.h"
+#import "NSBundle+GitUpKit.h"
 
 #if __GI_HAS_APPKIT__
-
-extern CFDictionaryRef GIDiffViewAttributes;
-
-extern CTLineRef GIDiffViewAddedLine;
-extern CTLineRef GIDiffViewDeletedLine;
-
-extern CGFloat GIDiffViewLineHeight;
-extern CGFloat GIDiffViewLineDescent;
-
-extern NSColor* GIDiffViewDeletedBackgroundColor;
-extern NSColor* GIDiffViewDeletedHighlightColor;
-extern NSColor* GIDiffViewAddedBackgroundColor;
-extern NSColor* GIDiffViewAddedHighlightColor;
-extern NSColor* GIDiffViewSeparatorBackgroundColor;
-extern NSColor* GIDiffViewSeparatorLineColor;
-extern NSColor* GIDiffViewSeparatorTextColor;
-extern NSColor* GIDiffViewVerticalLineColor;
-extern NSColor* GIDiffViewLineNumberColor;
-extern NSColor* GIDiffViewPlainTextColor;
 
 extern const char* GIDiffViewMissingNewlinePlaceholder;
 
@@ -62,7 +44,7 @@ extern void GIComputeHighlightRanges(const char* deletedBytes, NSUInteger delete
 @end
 
 @interface GIBranch ()
-@property(nonatomic, assign) GILine* mainLine;
+@property(nonatomic, weak) GILine* mainLine;
 @end
 
 @interface GILayer ()

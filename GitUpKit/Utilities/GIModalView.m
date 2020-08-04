@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,14 +23,9 @@
 #import "GIModalView.h"
 
 #import "XLFacilityMacros.h"
+#import "NSColor+GINamedColors.h"
 
 #define __ENABLE_BLUR__ 0
-
-#if __ENABLE_BLUR__
-#ifndef kCFCoreFoundationVersionNumber10_10
-#define kCFCoreFoundationVersionNumber10_10 1152
-#endif
-#endif
 
 #if __ENABLE_BLUR__
 #define kBlurRadius 20.0
@@ -48,17 +43,15 @@
   self.wantsLayer = YES;
 
 #if __ENABLE_BLUR__
-  if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber10_10) {  // Background filters don't seem to work on 10.8 and 10.9
-    size_t size;
-    if (sysctlbyname("hw.model", NULL, &size, NULL, 0) == 0) {
-      char* machine = malloc(size);
-      if (sysctlbyname("hw.model", machine, &size, NULL, 0) == 0) {
-        if (strncmp(machine, "MacBookAir", 10)) {  // MBA 2013 hangs for 1-2 seconds the first time the blur effect is used in the app
-          _useBackgroundFilters = YES;
-        }
+  size_t size;
+  if (sysctlbyname("hw.model", NULL, &size, NULL, 0) == 0) {
+    char* machine = malloc(size);
+    if (sysctlbyname("hw.model", machine, &size, NULL, 0) == 0) {
+      if (strncmp(machine, "MacBookAir", 10)) {  // MBA 2013 hangs for 1-2 seconds the first time the blur effect is used in the app
+        _useBackgroundFilters = YES;
       }
-      free(machine);
     }
+    free(machine);
   }
 
   if (_useBackgroundFilters) {
@@ -94,7 +87,6 @@
   view.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
   view.wantsLayer = YES;
   view.layer.borderWidth = 1.0;
-  view.layer.borderColor = [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.2] CGColor];
   view.layer.cornerRadius = 5.0;
 
 #if __ENABLE_BLUR__
@@ -112,19 +104,15 @@
     [[NSAnimationContext currentContext] setDuration:kAnimationDuration];
     [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
     [[NSAnimationContext currentContext] setCompletionHandler:^{
-
       if (handler) {
         handler();
       }
-
     }];
     [self.animator addSubview:view];
     [NSAnimationContext endGrouping];
   } else
 #endif
   {
-    view.layer.backgroundColor = [[NSColor colorWithDeviceRed:0.95 green:0.95 blue:0.95 alpha:1.0] CGColor];
-    self.layer.backgroundColor = [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.4] CGColor];
     [self addSubview:view];
     if (handler) {
       dispatch_async(dispatch_get_main_queue(), handler);
@@ -142,12 +130,10 @@
     [[NSAnimationContext currentContext] setDuration:kAnimationDuration];
     [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     [[NSAnimationContext currentContext] setCompletionHandler:^{
-
       view.wantsLayer = NO;
       if (handler) {
         handler();
       }
-
     }];
     [view.animator removeFromSuperviewWithoutNeedingDisplay];
     [NSAnimationContext endGrouping];
@@ -169,6 +155,24 @@
     if (handler) {
       dispatch_async(dispatch_get_main_queue(), handler);
     }
+  }
+}
+
+- (void)updateLayer {
+  NSView* view = self.subviews.firstObject;
+  if (!view) {
+    return;
+  }
+
+  view.layer.borderColor = NSColor.gitUpSeparatorColor.CGColor;
+
+#if __ENABLE_BLUR__
+  if (!_useBackgroundFilters)
+#endif
+  {
+    view.layer.backgroundColor = NSColor.windowBackgroundColor.CGColor;
+    // This is for dimming so deliberately does not adapt for dark mode.
+    self.layer.backgroundColor = [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.4] CGColor];
   }
 }
 

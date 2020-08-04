@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -83,14 +83,18 @@
   _dropButton.enabled = NO;
 }
 
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   XLOG_DEBUG_CHECK(self.repository.stashesEnabled == NO);
   self.repository.stashesEnabled = YES;
 
   [self _reloadStashes];
 }
 
-- (void)viewDidHide {
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
+
   _stashes = nil;
   [_tableView reloadData];
 
@@ -234,14 +238,13 @@
   [self.windowController runModalView:_saveView
             withInitialFirstResponder:_messageTextField
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* message = [_messageTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                         NSError* error;
                         GCStash* stash = [self.repository saveStashWithMessage:(message.length ? message : nil) keepIndex:_indexButton.state includeUntracked:_untrackedButton.state error:&error];
                         if (stash) {
                           [self.undoManager setActionName:NSLocalizedString(@"Save Stash", nil)];
-                          [[self.undoManager prepareWithInvocationTarget:self] _undoSaveStash:stash withMessage:(message.length ? message : nil) keepIndex:_indexButton.state includeUntracked:_untrackedButton.state ignore:NO];  // TODO: We should really use the built-in undo mechanism from GCLiveRepository
+                          [[self.undoManager prepareWithInvocationTarget:self] _undoSaveStash:stash withMessage:(message.length ? message : nil)keepIndex:_indexButton.state includeUntracked:_untrackedButton.state ignore:NO];  // TODO: We should really use the built-in undo mechanism from GCLiveRepository
                           [self.repository notifyRepositoryChanged];
 
                           [self.view.window makeFirstResponder:_tableView];
@@ -251,7 +254,6 @@
                           [self presentError:error];
                         }
                       }
-
                     }];
 }
 
@@ -265,7 +267,6 @@
                                   button:NSLocalizedString(@"Apply Stash", nil)
                suppressionUserDefaultKey:kUserDefaultsKey_SkipApplyWarning
                                    block:^{
-
                                      NSError* error;
                                      if ([self.repository applyStash:stash restoreIndex:NO error:&error]) {
                                        [self.repository notifyRepositoryChanged];
@@ -273,7 +274,6 @@
                                      } else {
                                        [self presentError:error];
                                      }
-
                                    }];
   } else {
     NSBeep();

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,13 +25,17 @@ typedef NS_ENUM(NSUInteger, GIAlertType) {
 extern NSString* const GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters;
 extern NSString* const GICommitMessageViewUserDefaultKey_ShowMargins;
 extern NSString* const GICommitMessageViewUserDefaultKey_EnableSpellChecking;
+extern NSString* const GIUserDefaultKey_FontSize;  // NSNumber. Base font size for user interface text. Read this with GIFontSize() to always get a valid value.
+
+extern CGFloat const GIDefaultFontSize;
+
+FOUNDATION_EXPORT CGFloat GIFontSize(void);  // Reads GIUserDefaultKey_FontSize, falling back to GIDefaultFontSize if the user defaults value is not usable.
 
 @interface NSMutableAttributedString (GIAppKit)
 - (void)appendString:(NSString*)string withAttributes:(NSDictionary*)attributes;
 @end
 
 @interface NSAlert (GIAppKit)
-- (void)beginSheetModalForWindow:(NSWindow*)window withCompletionHandler:(void (^)(NSInteger returnCode))handler;  // AppKit version is 10.9+ only
 - (void)setType:(GIAlertType)type;  // Set the alert icon
 @end
 
@@ -65,4 +69,8 @@ extern NSString* const GICommitMessageViewUserDefaultKey_EnableSpellChecking;
 @interface GIDualSplitView : NSSplitView <NSSplitViewDelegate>  // This view assumes only 2 subviews and is its own delegate!
 @property(nonatomic) IBInspectable CGFloat minSize1;
 @property(nonatomic) IBInspectable CGFloat minSize2;
+@end
+
+@interface NSAppearance (GIAppearance)
+@property(nonatomic, readonly) BOOL matchesDarkAppearance;
 @end

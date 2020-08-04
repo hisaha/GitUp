@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 // Utilities
 #import <GitUpKit/GIAppKit.h>
 #import <GitUpKit/GIColorView.h>
+#import <GitUpKit/GILaunchServicesLocator.h>
 #import <GitUpKit/GILinkButton.h>
 #import <GitUpKit/GIModalView.h>
 #import <GitUpKit/GIViewController.h>

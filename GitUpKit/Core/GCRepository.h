@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ typedef NS_ENUM(NSUInteger, GCFileMode) {
 @end
 
 @interface GCRepository : NSObject
-@property(nonatomic, assign) id<GCRepositoryDelegate> delegate;
+@property(nonatomic, weak) id<GCRepositoryDelegate> delegate;
 @property(nonatomic, readonly) NSString* repositoryPath;
 @property(nonatomic, readonly) NSString* workingDirectoryPath;  // nil for a bare repository
 @property(nonatomic, readonly, getter=isReadOnly) BOOL readOnly;

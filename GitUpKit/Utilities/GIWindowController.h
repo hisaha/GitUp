@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ typedef NS_ENUM(NSUInteger, GIOverlayStyle) {
 @end
 
 @interface GIWindowController : NSWindowController
-@property(nonatomic, assign) id<GIWindowControllerDelegate> delegate;
+@property(nonatomic, weak) id<GIWindowControllerDelegate> delegate;
 @property(strong) GIWindow* window;  // Redeclare superclass property
 
 @property(nonatomic, readonly, getter=isOverlayVisible) BOOL overlayVisible;

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #import "GIAppKit.h"
 #import "GIConstants.h"
+#import "NSColor+GINamedColors.h"
 
 #import "XLFacilityMacros.h"
 
@@ -33,9 +34,16 @@
 NSString* const GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters = @"GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters";
 NSString* const GICommitMessageViewUserDefaultKey_ShowMargins = @"GICommitMessageViewUserDefaultKey_ShowMargins";
 NSString* const GICommitMessageViewUserDefaultKey_EnableSpellChecking = @"GICommitMessageViewUserDefaultKey_EnableSpellChecking";
+NSString* const GIUserDefaultKey_FontSize = @"GIUserDefaultKey_FontSize";
+
+CGFloat const GIDefaultFontSize = 10;
+
+CGFloat GIFontSize(void) {
+  CGFloat size = [[NSUserDefaults standardUserDefaults] floatForKey:GIUserDefaultKey_FontSize];
+  return size > 0 ? size : GIDefaultFontSize;
+}
 
 static const void* _associatedObjectCommitKey = &_associatedObjectCommitKey;
-static NSColor* _separatorColor = nil;
 
 @implementation NSMutableAttributedString (GIAppKit)
 
@@ -52,18 +60,6 @@ static NSColor* _separatorColor = nil;
 @end
 
 @implementation NSAlert (GIAppKit)
-
-+ (void)_alertDidEnd:(NSAlert*)alert returnCode:(NSInteger)returnCode contextInfo:(void*)contextInfo {
-  void (^handler)(NSInteger) = contextInfo ? CFBridgingRelease(contextInfo) : NULL;
-  [alert.window orderOut:nil];  // Dismiss the alert window before the handler might chain another one
-  if (handler) {
-    handler(returnCode);
-  }
-}
-
-- (void)beginSheetModalForWindow:(NSWindow*)window withCompletionHandler:(void (^)(NSInteger returnCode))handler {
-  [self beginSheetModalForWindow:window modalDelegate:[NSAlert class] didEndSelector:@selector(_alertDidEnd:returnCode:contextInfo:) contextInfo:(handler ? (void*)CFBridgingRetain(handler) : NULL)];
-}
 
 - (void)setType:(GIAlertType)type {
   switch (type) {
@@ -153,6 +149,7 @@ static NSColor* _separatorColor = nil;
 @implementation GICommitMessageView
 
 - (void)dealloc {
+  [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:GIUserDefaultKey_FontSize context:(__bridge void*)[GICommitMessageView class]];
   [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_EnableSpellChecking context:(__bridge void*)[GICommitMessageView class]];
   [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_ShowMargins context:(__bridge void*)[GICommitMessageView class]];
   [[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters context:(__bridge void*)[GICommitMessageView class]];
@@ -161,7 +158,7 @@ static NSColor* _separatorColor = nil;
 - (void)awakeFromNib {
   [super awakeFromNib];
 
-  self.font = [NSFont userFixedPitchFontOfSize:11];
+  [self updateFont];
   self.continuousSpellCheckingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:GICommitMessageViewUserDefaultKey_EnableSpellChecking];
   self.automaticSpellingCorrectionEnabled = NO;  // Don't trust IB
   self.grammarCheckingEnabled = NO;  // Don't trust IB
@@ -171,11 +168,20 @@ static NSColor* _separatorColor = nil;
   self.automaticDataDetectionEnabled = NO;  // Don't trust IB
   self.automaticTextReplacementEnabled = NO;  // Don't trust IB
   self.smartInsertDeleteEnabled = YES;  // Don't trust IB
+  self.textColor = NSColor.textColor;  // Don't trust IB
+  self.backgroundColor = NSColor.textBackgroundColor;  // Don't trust IB
   [self.textContainer replaceLayoutManager:[[GILayoutManager alloc] init]];
 
   [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters options:0 context:(__bridge void*)[GICommitMessageView class]];
   [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_ShowMargins options:0 context:(__bridge void*)[GICommitMessageView class]];
   [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:GICommitMessageViewUserDefaultKey_EnableSpellChecking options:0 context:(__bridge void*)[GICommitMessageView class]];
+  [[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:GIUserDefaultKey_FontSize options:0 context:(__bridge void*)[GICommitMessageView class]];
+}
+
+- (void)updateFont {
+  // To match the original design, the commit message font should be 10% larger than the diff view font.
+  self.font = [NSFont userFixedPitchFontOfSize:round(1.1 * GIFontSize())];
+  [self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -184,7 +190,10 @@ static NSColor* _separatorColor = nil;
   if ([[NSUserDefaults standardUserDefaults] boolForKey:GICommitMessageViewUserDefaultKey_ShowMargins]) {
     NSRect bounds = self.bounds;
     CGFloat offset = self.textContainerOrigin.x + self.textContainerInset.width + self.textContainer.lineFragmentPadding;
-    CGFloat charWidth = self.font.maximumAdvancement.width;  // TODO: Is this the most reliable way to get the character width of a fixed-width font?
+    CGFloat charWidth = [@"x" sizeWithAttributes:@{
+                          NSFontAttributeName : self.font
+                        }]
+                            .width;
     CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
 
     CGContextSaveGState(context);
@@ -192,7 +201,7 @@ static NSColor* _separatorColor = nil;
     CGFloat x1 = floor(offset + kSummaryMaxWidth * charWidth) + 0.5;
     const CGFloat pattern1[] = {2, 4};
     CGContextSetLineDash(context, 0, pattern1, 2);
-    CGContextSetRGBStrokeColor(context, 0.33, 0.33, 0.33, 0.2);
+    CGContextSetStrokeColorWithColor(context, NSColor.tertiaryLabelColor.CGColor);
     CGContextMoveToPoint(context, x1, 0);
     CGContextAddLineToPoint(context, x1, bounds.size.height);
     CGContextStrokePath(context);
@@ -200,7 +209,7 @@ static NSColor* _separatorColor = nil;
     CGFloat x2 = floor(offset + kBodyMaxWidth * charWidth) + 0.5;
     const CGFloat pattern2[] = {4, 2};
     CGContextSetLineDash(context, 0, pattern2, 2);
-    CGContextSetRGBStrokeColor(context, 0.33, 0.33, 0.33, 0.2);
+    CGContextSetStrokeColorWithColor(context, NSColor.tertiaryLabelColor.CGColor);
     CGContextMoveToPoint(context, x2, 0);
     CGContextAddLineToPoint(context, x2, bounds.size.height);
     CGContextStrokePath(context);
@@ -225,6 +234,8 @@ static NSColor* _separatorColor = nil;
         self.continuousSpellCheckingEnabled = flag;
         [self setNeedsDisplay:YES];  // TODO: Why is this needed to refresh?
       }
+    } else if ([keyPath isEqualToString:GIUserDefaultKey_FontSize]) {
+      [self updateFont];
     } else {
       XLOG_DEBUG_UNREACHABLE();
     }
@@ -237,11 +248,12 @@ static NSColor* _separatorColor = nil;
 
 @implementation GITableCellView
 
-+ (void)initialize {
-  _separatorColor = [NSColor colorWithDeviceRed:0.9 green:0.9 blue:0.9 alpha:1.0];
-}
-
 - (void)saveTextFieldColors {
+  if (@available(macOS 10.14, *)) {
+    // Handled fully automatically.
+    return;
+  }
+
   for (NSView* view in self.subviews) {
     if ([view isKindOfClass:[NSTextField class]]) {
       objc_setAssociatedObject(view, _associatedObjectCommitKey, [(NSTextField*)view textColor], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -258,10 +270,15 @@ static NSColor* _separatorColor = nil;
 - (void)setBackgroundStyle:(NSBackgroundStyle)backgroundStyle {
   [super setBackgroundStyle:backgroundStyle];
 
+  if (@available(macOS 10.14, *)) {
+    // Handled fully automatically.
+    return;
+  }
+
   for (NSView* view in self.subviews) {
     if ([view isKindOfClass:[NSTextField class]]) {
-      if (backgroundStyle == NSBackgroundStyleDark) {
-        [(NSTextField*)view setTextColor:[NSColor whiteColor]];
+      if (backgroundStyle == NSBackgroundStyleEmphasized) {
+        [(NSTextField*)view setTextColor:NSColor.alternateSelectedControlTextColor];
       } else {
         [(NSTextField*)view setTextColor:objc_getAssociatedObject(view, _associatedObjectCommitKey)];
       }
@@ -273,7 +290,7 @@ static NSColor* _separatorColor = nil;
   NSRect bounds = self.bounds;
   CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
 
-  [_separatorColor setStroke];
+  [NSColor.gitUpSeparatorColor setStroke];
   CGContextMoveToPoint(context, 0, 0.5);
   CGContextAddLineToPoint(context, bounds.size.width, 0.5);
   CGContextStrokePath(context);
@@ -365,23 +382,19 @@ static NSColor* _separatorColor = nil;
 - (void)splitView:(NSSplitView*)splitView resizeSubviewsWithOldSize:(NSSize)oldSize {
   [splitView adjustSubviews];
   // Take the min size constraints into account.
-  // Using -setPosition:ofDividerAtIndex: from inside this method confuses Core Animation on 10.8.
-  if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber10_9) {
-    NSView* view = splitView.subviews.firstObject;
-    [splitView setPosition:(splitView.vertical ? view.frame.size.width : view.frame.size.height) ofDividerAtIndex:0];
+  NSView* view = splitView.subviews.firstObject;
+  [splitView setPosition:(splitView.vertical ? view.frame.size.width : view.frame.size.height) ofDividerAtIndex:0];
+}
+
+@end
+
+@implementation NSAppearance (GIAppearance)
+
+- (BOOL)matchesDarkAppearance {
+  if (@available(macOS 10.14, *)) {
+    return [[self bestMatchFromAppearancesWithNames:@[ NSAppearanceNameAqua, NSAppearanceNameDarkAqua ]] isEqual:NSAppearanceNameDarkAqua];
   } else {
-    NSView* view1 = splitView.subviews[0];
-    NSView* view2 = splitView.subviews[1];
-    NSSize splitViewSize = splitView.bounds.size;
-    if (splitView.vertical) {
-      CGFloat splitPosition = MAX(view1.bounds.size.width, _minSize1);
-      view1.frame = NSMakeRect(0, 0, splitPosition, splitViewSize.height);
-      view2.frame = NSMakeRect(splitPosition + splitView.dividerThickness, 0, splitViewSize.width - splitPosition - splitView.dividerThickness, splitViewSize.height);
-    } else {
-      CGFloat splitPosition = MAX(view1.bounds.size.height, _minSize1);
-      view1.frame = NSMakeRect(0, 0, splitViewSize.width, splitPosition);
-      view2.frame = NSMakeRect(0, splitPosition + splitView.dividerThickness, splitViewSize.width, splitViewSize.height - splitPosition - splitView.dividerThickness);
-    }
+    return NO;
   }
 }
 

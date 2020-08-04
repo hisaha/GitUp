@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ typedef NS_ENUM(NSUInteger, GCFileDiffChange) {
 
 typedef void (^GCDiffBeginHunkHandler)(NSUInteger oldLineNumber, NSUInteger oldLineCount, NSUInteger newLineNumber, NSUInteger newLineCount);
 typedef void (^GCDiffLineHandler)(GCLineDiffChange change, NSUInteger oldLineNumber, NSUInteger newLineNumber, const char* contentBytes, NSUInteger contentLength);
-typedef void (^GCDiffEndHunkHandler)();
+typedef void (^GCDiffEndHunkHandler)(void);
 
 @interface GCDiffFile : NSObject
 @property(nonatomic, readonly) NSString* path;

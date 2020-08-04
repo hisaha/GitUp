@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,10 @@
 #endif
 
 #import "GCPrivate.h"
+
+#import <sys/stat.h>
+#import <sys/attr.h>
+#import <sys/mount.h>
 
 NSString* const GCErrorDomain = @"GCErrorDomain";
 
@@ -87,7 +91,7 @@ NSData* GCCleanedUpCommitMessage(NSString* message) {
 }
 
 NSString* GCUserFromSignature(const git_signature* signature) {
-  return [NSString stringWithFormat:@"%@ <%s>", [NSString stringWithUTF8String:signature->name], signature->email];
+  return [NSString stringWithFormat:@"%@ <%@>", @(signature->name), @(signature->email)];
 }
 
 // We can't use -[NSString fileSystemRepresentation] as it returns decomposed UTF8 while everything in Git is composed UTF8
@@ -130,6 +134,35 @@ NSString* GCGitURLFromURL(NSURL* url) {
   }
   return url.absoluteString;
 }
+
+int GCExchangeFileData(const char* path1, const char* path2) {
+  struct statfs stat;
+  int statStatus = statfs(path2, &stat);
+  if (statStatus != 0) {
+    return statStatus;
+  }
+  struct attrlist attrList = {ATTR_BIT_MAP_COUNT, 0, 0, ATTR_VOL_CAPABILITIES, 0, 0, 0};
+  struct {
+    u_int32_t length;
+    vol_capabilities_attr_t attr;
+  } attrBuf;
+  int attrListStatus = getattrlist(stat.f_mntonname, &attrList, &attrBuf, sizeof(attrBuf), 0);
+  if (attrListStatus != 0) {
+    return attrListStatus;
+  }
+
+  if (@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)) {
+    if ((attrBuf.attr.capabilities[VOL_CAPABILITIES_INTERFACES] & VOL_CAP_INT_RENAME_SWAP) == VOL_CAP_INT_RENAME_SWAP) {
+      return renamex_np(path1, path2, RENAME_SWAP);
+    }
+  }
+
+  if ((attrBuf.attr.capabilities[VOL_CAPABILITIES_INTERFACES] & VOL_CAP_INT_EXCHANGEDATA) == VOL_CAP_INT_EXCHANGEDATA) {
+    return exchangedata(path1, path2, FSOPT_NOFOLLOW);
+  }
+
+  return -1;
+};
 
 GCFileMode GCFileModeFromMode(git_filemode_t mode) {
   switch (mode) {

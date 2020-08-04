@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ extern GIGitFlowConfigKey const GIGitFlowPrefixVersionTag;
 @end
 
 @interface GIMapViewController : GIViewController <NSUserInterfaceValidations>
-@property(nonatomic, assign) id<GIMapViewControllerDelegate> delegate;
+@property(nonatomic, weak) id<GIMapViewControllerDelegate> delegate;
 @property(nonatomic, readonly) GIGraph* graph;
 @property(nonatomic, readonly) GCHistoryCommit* selectedCommit;  // Nil if no commit is selected
 @property(nonatomic, strong) GCHistory* previewHistory;

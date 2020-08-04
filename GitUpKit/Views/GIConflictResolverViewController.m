@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,7 +57,9 @@
   [_filesView replaceWithView:_diffFilesViewController.view];
 }
 
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   XLOG_DEBUG_CHECK(self.repository.statusMode == kGCLiveRepositoryStatusMode_Disabled);
   self.repository.statusMode = kGCLiveRepositoryStatusMode_Unified;
 
@@ -67,7 +69,9 @@
   [self _reloadContents];
 }
 
-- (void)viewDidHide {
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
+
   _unifiedStatus = nil;
   _indexConflicts = nil;
 
@@ -165,7 +169,7 @@
   [_delegate conflictResolverViewControllerShouldCancel:self];
 }
 
-- (IBAction) continue:(id)sender {
+- (IBAction)continue:(id)sender {
   [_delegate conflictResolverViewControllerDidFinish:self];
 }
 

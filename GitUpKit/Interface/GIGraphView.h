@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,14 +24,13 @@
 @end
 
 @interface GIGraphView : NSView <NSUserInterfaceValidations>
-@property(nonatomic, assign) id<GIGraphViewDelegate> delegate;
+@property(nonatomic, weak) id<GIGraphViewDelegate> delegate;
 @property(nonatomic, strong) GIGraph* graph;
 @property(nonatomic) BOOL showsTagLabels;
 @property(nonatomic) BOOL showsBranchLabels;
-@property(nonatomic, strong) NSColor* backgroundColor;
 
-@property(nonatomic, assign) GINode* selectedNode;  // Setting this property directly does not call the delegate
-@property(nonatomic, assign) GCHistoryCommit* selectedCommit;  // Convenience method that wraps @selectedNode
+@property(nonatomic, weak) GINode* selectedNode;  // Setting this property directly does not call the delegate
+@property(nonatomic, weak) GCHistoryCommit* selectedCommit;  // Convenience method that wraps @selectedNode
 
 @property(nonatomic, readonly) NSSize minSize;
 

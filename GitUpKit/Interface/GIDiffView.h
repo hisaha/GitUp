@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,11 +26,17 @@
 - (void)didFinishInitializing;  // For subclasses only
 - (void)didUpdatePatch;  // For subclasses only
 
-@property(nonatomic, assign) id<GIDiffViewDelegate> delegate;
+@property(nonatomic, weak) id<GIDiffViewDelegate> delegate;
 @property(nonatomic, strong) NSColor* backgroundColor;
 @property(nonatomic, strong) GCDiffPatch* patch;
 @property(nonatomic, readonly, getter=isEmpty) BOOL empty;
 - (CGFloat)updateLayoutForWidth:(CGFloat)width;
+
+@property(nonatomic, readonly) CFDictionaryRef textAttributes;
+@property(nonatomic, readonly) CTLineRef addedLine;
+@property(nonatomic, readonly) CTLineRef deletedLine;
+@property(nonatomic, readonly) CGFloat lineHeight;
+@property(nonatomic, readonly) CGFloat lineDescent;
 
 @property(nonatomic, readonly) BOOL hasSelection;
 @property(nonatomic, readonly) BOOL hasSelectedText;

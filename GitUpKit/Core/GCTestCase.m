@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ static const void* _associatedObjectKey = &_associatedObjectKey;
   return [self _runCLTWithPath:kGitCLTPath
                      arguments:array
               currentDirectory:(repository ? (repository.bare ? repository.repositoryPath : repository.workingDirectoryPath) : [[NSFileManager defaultManager] currentDirectoryPath])
-                   environment:(repository ? @{ @"XDG_CONFIG_HOME" : objc_getAssociatedObject(repository, _associatedObjectKey) } : @{})];
+              environment:(repository ? @{@"XDG_CONFIG_HOME" : objc_getAssociatedObject(repository, _associatedObjectKey)} : @{})];
 }
 
 - (NSString*)runGitCLTWithRepository:(GCRepository*)repository command:(NSString*)command, ... {
@@ -110,7 +110,7 @@ static const void* _associatedObjectKey = &_associatedObjectKey;
   va_start(arguments, command);
   NSString* result = [self _runGitCLTWithRepository:repository command:command arguments:arguments];
   va_end(arguments);
-  XCTAssertTrue([result rangeOfString:string].location != NSNotFound);  // -containsString: doesn't exist pre-10.10
+  XCTAssertTrue([result containsString:string]);
 }
 
 - (void)assertGitCLTOutputEndsWithString:(NSString*)string withRepository:(GCRepository*)repository command:(NSString*)command, ... {

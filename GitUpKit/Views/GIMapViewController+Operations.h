@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,10 +21,6 @@
 - (BOOL)checkCleanRepositoryForOperationOnCommit:(GCCommit*)commit;
 - (BOOL)checkCleanRepositoryForOperationOnBranch:(GCLocalBranch*)branch;
 
-- (void)checkoutCommit:(GCHistoryCommit*)commit;
-- (void)checkoutLocalBranch:(GCHistoryLocalBranch*)branch;
-- (void)checkoutRemoteBranch:(GCHistoryRemoteBranch*)remoteBranch;
-
 - (void)swapCommitWithParent:(GCHistoryCommit*)commit;
 - (void)swapCommitWithChild:(GCHistoryCommit*)commit;
 - (void)squashCommitWithParent:(GCHistoryCommit*)commit;
@@ -33,6 +29,7 @@
 - (void)cherryPickCommit:(GCHistoryCommit*)commit againstLocalBranch:(GCHistoryLocalBranch*)branch;
 - (void)revertCommit:(GCHistoryCommit*)commit againstLocalBranch:(GCHistoryLocalBranch*)branch;
 - (void)editCommitMessage:(GCHistoryCommit*)commit;
+- (void)copyCommitMessage:(GCHistoryCommit*)commit;
 
 - (void)createLocalBranchAtCommit:(GCHistoryCommit*)commit withName:(NSString*)name checkOut:(BOOL)checkOut;
 - (BOOL)createLocalBranchAtCommit:(GCHistoryCommit*)commit withName:(NSString*)name checkOut:(BOOL)checkOut error:(NSError **)error;

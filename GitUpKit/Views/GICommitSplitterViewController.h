@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 @end
 
 @interface GICommitSplitterViewController : GICommitViewController
-@property(nonatomic, assign) id<GICommitSplitterViewControllerDelegate> delegate;
+@property(nonatomic, weak) id<GICommitSplitterViewControllerDelegate> delegate;
 - (BOOL)startSplittingCommit:(GCHistoryCommit*)commit error:(NSError**)error;
 - (BOOL)finishSplittingCommitWithOldMessage:(NSString*)oldMessage newMessage:(NSString*)newMessage error:(NSError**)error;
 - (void)cancelSplittingCommit;

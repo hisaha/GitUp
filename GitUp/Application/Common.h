@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,9 +15,6 @@
 
 #define MAKE_ERROR(message) [NSError errorWithDomain:@"App" code:-1 userInfo:@{NSLocalizedDescriptionKey : message}]
 
-#define kReleaseChannel_Stable @"stable"
-#define kReleaseChannel_Continuous @"continuous"
-
 #define kUserDefaultsKey_FirstLaunch @"FirstLaunch"  // BOOL
 #define kUserDefaultsKey_SkipInstallCLT @"SkipInstallCLT"  // BOOL
 #define kUserDefaultsKey_LastVersion @"LastVersion"  // NSUInteger
@@ -26,8 +23,8 @@
 #define kUserDefaultsKey_SimpleCommit @"SimpleCommit"  // BOOL
 #define kUserDefaultsKey_DisableSparkle @"DisableSparkle"  // BOOL
 #define kUserDefaultsKey_DiffWhitespaceMode @"DiffWhitespaceMode"  // NSUInteger
-#define kUserDefaultsKey_EnableVisualEffects @"EnableVisualEffects"  // BOOL
 #define kUserDefaultsKey_ShowWelcomeWindow @"ShowWelcomeWindow"  // BOOL
+#define kUserDefaultsKey_Theme @"Theme"  // NSString
 
 #define kRepositoryUserInfoKey_SkipSubmoduleCheck @"SkipSubmoduleCheck"  // BOOL
 #define kRepositoryUserInfoKey_MainWindowFrame @"MainWindowFrame"  // NSString
@@ -38,5 +35,3 @@
 #define kURL_Issues @"https://github.com/git-up/GitUp/issues"
 #define kURL_Wiki @"https://github.com/git-up/GitUp/wiki"
 #define kURL_ReleaseNotes @"https://github.com/git-up/GitUp/releases"
-
-#define kURL_Twitter @"https://twitter.com/GitUpApp"

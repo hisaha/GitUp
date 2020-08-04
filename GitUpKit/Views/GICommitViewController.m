@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -104,7 +104,9 @@
 }
 
 // TODO: Live update these fields
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   if (_messageTextView.string.length == 0) {
     NSString* message = @"";
 
@@ -126,7 +128,9 @@
   [self _updateInterface];
 }
 
-- (void)viewDidHide {
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
+
   _headCommitMessage = nil;
 }
 

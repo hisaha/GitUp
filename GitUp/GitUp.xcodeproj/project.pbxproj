@@ -7,7 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A01676A2330CABD0069961E /* ServicesProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0167692330CABD0069961E /* ServicesProvider.m */; };
+		0A0C5ACB23720BAE000D84A1 /* KeychainAccessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0C5ACA23720BAE000D84A1 /* KeychainAccessor.m */; };
+		0A0D211B23579888003A2B5F /* AboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A0D211723579887003A2B5F /* AboutWindowController.m */; };
+		0A2BBECB235F9B2400912B65 /* AboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A2BBEC9235F9B2400912B65 /* AboutWindowController.xib */; };
+		0A2F488F23683DC90072C6FB /* AuthenticationWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F488E23683DC90072C6FB /* AuthenticationWindowController.m */; };
+		0A2F489223683DD60072C6FB /* AuthenticationWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A2F489023683DD60072C6FB /* AuthenticationWindowController.xib */; };
+		0A3388BC2353BD630022528D /* WelcomeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A3388BA2353BD630022528D /* WelcomeWindowController.xib */; };
+		0A58CD77237B4F4B00C2BDD0 /* CloneWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A58CD73237B4F4B00C2BDD0 /* CloneWindowController.m */; };
+		0A58CD7A237B4F9600C2BDD0 /* CloneWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0A58CD78237B4F9600C2BDD0 /* CloneWindowController.xib */; };
+		0AC8525123A11F2F00479160 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AC8525023A11F2F00479160 /* PreferencesWindowController.m */; };
+		0AC8525423A11F3700479160 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC8525223A11F3700479160 /* PreferencesWindowController.xib */; };
+		0AD4625B232711B000BE28D1 /* WelcomeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AD4625A232711B000BE28D1 /* WelcomeWindowController.m */; };
+		0AE7F5F12312C1B000B06050 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0AE7F5ED2312C1B000B06050 /* InfoPlist.strings */; };
 		165C32B61B95739700D2F894 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165C32B51B95739700D2F894 /* QuartzCore.framework */; };
+		31CD50E3203E2E2800360B3A /* ToolbarItemWrapperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 31CD50E2203E2E2800360B3A /* ToolbarItemWrapperView.m */; };
+		A53C6D0C1E61A9CF0070387E /* FontSizeTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A53C6D0B1E61A9CF0070387E /* FontSizeTransformer.m */; };
 		E212A6DE1B92100E00F62B18 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E212A6DD1B92100E00F62B18 /* libiconv.dylib */; };
 		E21739F71A5080DD00EC6777 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = E21739F61A5080DD00EC6777 /* DocumentController.m */; };
 		E21DCAEB1B253847006424E8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E21DCAEA1B253847006424E8 /* main.m */; };
@@ -34,9 +49,6 @@
 		E2C5672D1A6D98BC00ECFE07 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C5672C1A6D98BC00ECFE07 /* WindowController.m */; };
 		E2E3C9A01D771E7600AA9A62 /* GARawTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = E2E3C99F1D771E7600AA9A62 /* GARawTracker.m */; };
 		E2E3C9A21D771E9D00AA9A62 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2E3C9A11D771E9D00AA9A62 /* SystemConfiguration.framework */; };
-		E2E3C9A41D77227F00AA9A62 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2E3C9A31D77227F00AA9A62 /* HockeySDK.framework */; };
-		E2E3C9A51D77228F00AA9A62 /* HockeySDK.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = E2E3C9A31D77227F00AA9A62 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		FA78E1291E92D1D800C60FEB /* GitFlowInitWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = FA78E1281E92D1D800C60FEB /* GitFlowInitWindow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,7 +109,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				E267E1F31B84D93300BAB377 /* Sparkle.framework in Copy Frameworks */,
-				E2E3C9A51D77228F00AA9A62 /* HockeySDK.framework in Copy Frameworks */,
 				E28A16E61B87023C00218332 /* GitUpKit.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -106,7 +117,33 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A0167682330CABD0069961E /* ServicesProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ServicesProvider.h; sourceTree = "<group>"; };
+		0A0167692330CABD0069961E /* ServicesProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ServicesProvider.m; sourceTree = "<group>"; };
+		0A0C5AC923720BAE000D84A1 /* KeychainAccessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeychainAccessor.h; sourceTree = "<group>"; };
+		0A0C5ACA23720BAE000D84A1 /* KeychainAccessor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeychainAccessor.m; sourceTree = "<group>"; };
+		0A0D211723579887003A2B5F /* AboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutWindowController.m; sourceTree = "<group>"; };
+		0A0D211A23579887003A2B5F /* AboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutWindowController.h; sourceTree = "<group>"; };
+		0A2BBECA235F9B2400912B65 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/AboutWindowController.xib; sourceTree = "<group>"; };
+		0A2F488B23683DC90072C6FB /* AuthenticationWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AuthenticationWindowController.h; sourceTree = "<group>"; };
+		0A2F488E23683DC90072C6FB /* AuthenticationWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AuthenticationWindowController.m; sourceTree = "<group>"; };
+		0A2F489123683DD60072C6FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/AuthenticationWindowController.xib; sourceTree = "<group>"; };
+		0A3388BB2353BD630022528D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/WelcomeWindowController.xib; sourceTree = "<group>"; };
+		0A58CD73237B4F4B00C2BDD0 /* CloneWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloneWindowController.m; sourceTree = "<group>"; };
+		0A58CD76237B4F4B00C2BDD0 /* CloneWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloneWindowController.h; sourceTree = "<group>"; };
+		0A58CD79237B4F9600C2BDD0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/CloneWindowController.xib; sourceTree = "<group>"; };
+		0AC8524D23A11F2F00479160 /* PreferencesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesWindowController.h; sourceTree = "<group>"; };
+		0AC8525023A11F2F00479160 /* PreferencesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesWindowController.m; sourceTree = "<group>"; };
+		0AC8525323A11F3700479160 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreferencesWindowController.xib; sourceTree = "<group>"; };
+		0AD46259232711B000BE28D1 /* WelcomeWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WelcomeWindowController.h; sourceTree = "<group>"; };
+		0AD4625A232711B000BE28D1 /* WelcomeWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WelcomeWindowController.m; sourceTree = "<group>"; };
+		0AE7F5EE2312C1B000B06050 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		165C32B51B95739700D2F894 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		1D2DA2F923E9E99700691DEF /* GitUp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GitUp.entitlements; sourceTree = "<group>"; };
+		31CD50E1203E2E2800360B3A /* ToolbarItemWrapperView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToolbarItemWrapperView.h; sourceTree = "<group>"; };
+		31CD50E2203E2E2800360B3A /* ToolbarItemWrapperView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToolbarItemWrapperView.m; sourceTree = "<group>"; };
+		3DB98C7D23E091650039B454 /* DEVELOPMENT_TEAM.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DEVELOPMENT_TEAM.xcconfig; sourceTree = "<group>"; };
+		A53C6D0A1E61A9CF0070387E /* FontSizeTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontSizeTransformer.h; sourceTree = "<group>"; };
+		A53C6D0B1E61A9CF0070387E /* FontSizeTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FontSizeTransformer.m; sourceTree = "<group>"; };
 		E212A6DD1B92100E00F62B18 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		E21739F51A5080DD00EC6777 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentController.h; sourceTree = "<group>"; };
 		E21739F61A5080DD00EC6777 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentController.m; sourceTree = "<group>"; };
@@ -119,7 +156,6 @@
 		E2653D241A5B2FBD006A9871 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = "Third-Party/Sparkle.framework"; sourceTree = SOURCE_ROOT; };
 		E27E37561B86F670000A551A /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		E27E37571B86F670000A551A /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		E27E37581B86F670000A551A /* Distribution.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Distribution.xcconfig; sourceTree = "<group>"; };
 		E27E37591B86F670000A551A /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		E28200AC1A7D71EE00DA4096 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		E28A16DA1B87021600218332 /* GitUpKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GitUpKit.xcodeproj; path = ../GitUpKit/GitUpKit.xcodeproj; sourceTree = "<group>"; };
@@ -139,8 +175,8 @@
 		E2C3394419F85D4B00063D95 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		E2C5672B1A6D98BC00ECFE07 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowController.h; sourceTree = "<group>"; };
 		E2C5672C1A6D98BC00ECFE07 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowController.m; sourceTree = "<group>"; };
-		E2C8C91519FABC5100DA54AA /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/Document.xib; sourceTree = "<group>"; };
-		E2C8C91619FABC5100DA54AA /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		E2C8C91519FABC5100DA54AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = "<group>"; };
+		E2C8C91619FABC5100DA54AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		E2E3C99E1D771E7600AA9A62 /* GARawTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GARawTracker.h; sourceTree = "<group>"; };
 		E2E3C99F1D771E7600AA9A62 /* GARawTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GARawTracker.m; sourceTree = "<group>"; };
 		E2E3C9A11D771E9D00AA9A62 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -171,7 +207,6 @@
 				E2C338D719F85C2E00063D95 /* Cocoa.framework in Frameworks */,
 				E267E26B1B84E07E00BAB377 /* Security.framework in Frameworks */,
 				E28A16E51B87023200218332 /* GitUpKit.framework in Frameworks */,
-				E2E3C9A41D77227F00AA9A62 /* HockeySDK.framework in Frameworks */,
 				E2653D251A5B2FBD006A9871 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -211,8 +246,8 @@
 			children = (
 				E27E37561B86F670000A551A /* Base.xcconfig */,
 				E27E37571B86F670000A551A /* Debug.xcconfig */,
-				E27E37581B86F670000A551A /* Distribution.xcconfig */,
 				E27E37591B86F670000A551A /* Release.xcconfig */,
+				3DB98C7D23E091650039B454 /* DEVELOPMENT_TEAM.xcconfig */,
 			);
 			name = "Xcode-Configurations";
 			path = "../Xcode-Configurations";
@@ -258,6 +293,7 @@
 			isa = PBXGroup;
 			children = (
 				FA78E1261E92D1D800C60FEB /* GitFlow */,
+				1D2DA2F923E9E99700691DEF /* GitUp.entitlements */,
 				E2C338B019F8562F00063D95 /* AppDelegate.h */,
 				E2C338B119F8562F00063D95 /* AppDelegate.m */,
 				E25EBCEA1AA3F8B700D3AF44 /* Application.xcassets */,
@@ -270,10 +306,34 @@
 				E2BDA0671AD47A2F00E69729 /* Help.plist */,
 				E2C338AF19F8562F00063D95 /* Info.plist */,
 				E2A5BE6E1A814970008DD47F /* Localizable.strings */,
+				0AE7F5ED2312C1B000B06050 /* InfoPlist.strings */,
 				E2C338B319F8562F00063D95 /* main.m */,
 				E2C338BD19F8562F00063D95 /* MainMenu.xib */,
+				A53C6D0A1E61A9CF0070387E /* FontSizeTransformer.h */,
+				A53C6D0B1E61A9CF0070387E /* FontSizeTransformer.m */,
 				E2C5672B1A6D98BC00ECFE07 /* WindowController.h */,
 				E2C5672C1A6D98BC00ECFE07 /* WindowController.m */,
+				31CD50E1203E2E2800360B3A /* ToolbarItemWrapperView.h */,
+				31CD50E2203E2E2800360B3A /* ToolbarItemWrapperView.m */,
+				0A0167682330CABD0069961E /* ServicesProvider.h */,
+				0A0167692330CABD0069961E /* ServicesProvider.m */,
+				0A0D211A23579887003A2B5F /* AboutWindowController.h */,
+				0A0D211723579887003A2B5F /* AboutWindowController.m */,
+				0A2BBEC9235F9B2400912B65 /* AboutWindowController.xib */,
+				0A2F488B23683DC90072C6FB /* AuthenticationWindowController.h */,
+				0A2F488E23683DC90072C6FB /* AuthenticationWindowController.m */,
+				0A2F489023683DD60072C6FB /* AuthenticationWindowController.xib */,
+				0A58CD76237B4F4B00C2BDD0 /* CloneWindowController.h */,
+				0A58CD73237B4F4B00C2BDD0 /* CloneWindowController.m */,
+				0A58CD78237B4F9600C2BDD0 /* CloneWindowController.xib */,
+				0AC8524D23A11F2F00479160 /* PreferencesWindowController.h */,
+				0AC8525023A11F2F00479160 /* PreferencesWindowController.m */,
+				0AC8525223A11F3700479160 /* PreferencesWindowController.xib */,
+				0AD46259232711B000BE28D1 /* WelcomeWindowController.h */,
+				0AD4625A232711B000BE28D1 /* WelcomeWindowController.m */,
+				0A3388BA2353BD630022528D /* WelcomeWindowController.xib */,
+				0A0C5AC923720BAE000D84A1 /* KeychainAccessor.h */,
+				0A0C5ACA23720BAE000D84A1 /* KeychainAccessor.m */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -326,6 +386,7 @@
 				E2C338A919F8562F00063D95 /* Resources */,
 				E2653D271A5B3298006A9871 /* Copy Frameworks */,
 				E21DCAF21B2538FB006424E8 /* Copy Tool */,
+				1D7D03E724528390002C1736 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -343,23 +404,26 @@
 		E2C338A319F8562F00063D95 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					E21DCAE71B253847006424E8 = {
 						CreatedOnToolsVersion = 6.3.2;
+						ProvisioningStyle = Automatic;
 					};
 					E2C338AA19F8562F00063D95 = {
 						CreatedOnToolsVersion = 6.1;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
 			buildConfigurationList = E2C338A619F8562F00063D95 /* Build configuration list for PBXProject "GitUp" */;
 			compatibilityVersion = "Xcode 8.0";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = E2C338A219F8562F00063D95;
 			productRefGroup = E2C338AC19F8562F00063D95 /* Products */;
@@ -408,14 +472,40 @@
 			buildActionMask = 2147483647;
 			files = (
 				E25EBCEB1AA3F8B700D3AF44 /* Application.xcassets in Resources */,
+				0A58CD7A237B4F9600C2BDD0 /* CloneWindowController.xib in Resources */,
+				0A3388BC2353BD630022528D /* WelcomeWindowController.xib in Resources */,
+				0A2BBECB235F9B2400912B65 /* AboutWindowController.xib in Resources */,
+				0AE7F5F12312C1B000B06050 /* InfoPlist.strings in Resources */,
 				E2A5BE701A814970008DD47F /* Localizable.strings in Resources */,
 				E2C338BA19F8562F00063D95 /* Document.xib in Resources */,
+				0AC8525423A11F3700479160 /* PreferencesWindowController.xib in Resources */,
+				0A2F489223683DD60072C6FB /* AuthenticationWindowController.xib in Resources */,
 				E2C338BF19F8562F00063D95 /* MainMenu.xib in Resources */,
 				E267E2741B84E42A00BAB377 /* Help.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1D7D03E724528390002C1736 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Code sign sparkle app\nLOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\n\n# By default, use the configured code signing identity for the project/target\nIDENTITY=\"${CODE_SIGN_IDENTITY}\"\nif [ \"$IDENTITY\" == \"\" ]\nthen\n  # If a code signing identity is not specified, use ad hoc signing\n  IDENTITY=\"-\"\nfi\ncodesign --verbose --force --deep -o runtime --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A/Resources/AutoUpdate.app\"\ncodesign --verbose --force -o runtime --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E21DCAE41B253847006424E8 /* Sources */ = {
@@ -430,13 +520,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A01676A2330CABD0069961E /* ServicesProvider.m in Sources */,
 				E21739F71A5080DD00EC6777 /* DocumentController.m in Sources */,
 				E2E3C9A01D771E7600AA9A62 /* GARawTracker.m in Sources */,
 				E2C338B419F8562F00063D95 /* main.m in Sources */,
 				E2C5672D1A6D98BC00ECFE07 /* WindowController.m in Sources */,
-				FA78E1291E92D1D800C60FEB /* GitFlowInitWindow.m in Sources */,
+				A53C6D0C1E61A9CF0070387E /* FontSizeTransformer.m in Sources */,
 				E2C338B219F8562F00063D95 /* AppDelegate.m in Sources */,
+				0A58CD77237B4F4B00C2BDD0 /* CloneWindowController.m in Sources */,
 				E2C338B719F8562F00063D95 /* Document.m in Sources */,
+				0AD4625B232711B000BE28D1 /* WelcomeWindowController.m in Sources */,
+				0A0D211B23579888003A2B5F /* AboutWindowController.m in Sources */,
+				0AC8525123A11F2F00479160 /* PreferencesWindowController.m in Sources */,
+				31CD50E3203E2E2800360B3A /* ToolbarItemWrapperView.m in Sources */,
+				0A2F488F23683DC90072C6FB /* AuthenticationWindowController.m in Sources */,
+				0A0C5ACB23720BAE000D84A1 /* KeychainAccessor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +554,54 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		0A2BBEC9235F9B2400912B65 /* AboutWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A2BBECA235F9B2400912B65 /* Base */,
+			);
+			name = AboutWindowController.xib;
+			sourceTree = "<group>";
+		};
+		0A2F489023683DD60072C6FB /* AuthenticationWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A2F489123683DD60072C6FB /* Base */,
+			);
+			name = AuthenticationWindowController.xib;
+			sourceTree = "<group>";
+		};
+		0A3388BA2353BD630022528D /* WelcomeWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A3388BB2353BD630022528D /* Base */,
+			);
+			name = WelcomeWindowController.xib;
+			sourceTree = "<group>";
+		};
+		0A58CD78237B4F9600C2BDD0 /* CloneWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0A58CD79237B4F9600C2BDD0 /* Base */,
+			);
+			name = CloneWindowController.xib;
+			sourceTree = "<group>";
+		};
+		0AC8525223A11F3700479160 /* PreferencesWindowController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0AC8525323A11F3700479160 /* Base */,
+			);
+			name = PreferencesWindowController.xib;
+			sourceTree = "<group>";
+		};
+		0AE7F5ED2312C1B000B06050 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0AE7F5EE2312C1B000B06050 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		E2A5BE6E1A814970008DD47F /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -475,7 +621,7 @@
 		E2C338B819F8562F00063D95 /* Document.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				E2C8C91519FABC5100DA54AA /* en */,
+				E2C8C91519FABC5100DA54AA /* Base */,
 			);
 			name = Document.xib;
 			sourceTree = "<group>";
@@ -483,7 +629,7 @@
 		E2C338BD19F8562F00063D95 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				E2C8C91619FABC5100DA54AA /* en */,
+				E2C8C91619FABC5100DA54AA /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -494,14 +640,17 @@
 		E21DCAEC1B253847006424E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_DYNAMIC_NO_PIC = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = CATN5JG2W2;
 				HEADER_SEARCH_PATHS = "../GitUpKit/Third-Party/libgit2/include";
 				OTHER_LDFLAGS = (
 					"$(BUILD_DIR)/$(CONFIGURATION)/libgit2.a",
-					"../GitUpKit/Third-Party/Libraries/libssl/$(PLATFORM_NAME)/lib/libcrypto.a",
-					"../GitUpKit/Third-Party/Libraries/libssh2/$(PLATFORM_NAME)/lib/libssh2.a",
+					"../GitUpKit/Third-Party/libssl/$(GITUP_PLATFORM)/lib/libcrypto.a",
+					"../GitUpKit/Third-Party/libssh2/$(GITUP_PLATFORM)/lib/libssh2.a",
 				);
 				PRODUCT_NAME = gitup;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -509,14 +658,17 @@
 		E21DCAED1B253847006424E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_DYNAMIC_NO_PIC = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = CATN5JG2W2;
 				HEADER_SEARCH_PATHS = "../GitUpKit/Third-Party/libgit2/include";
 				OTHER_LDFLAGS = (
 					"$(BUILD_DIR)/$(CONFIGURATION)/libgit2.a",
-					"../GitUpKit/Third-Party/Libraries/libssl/$(PLATFORM_NAME)/lib/libcrypto.a",
-					"../GitUpKit/Third-Party/Libraries/libssh2/$(PLATFORM_NAME)/lib/libssh2.a",
+					"../GitUpKit/Third-Party/libssl/$(GITUP_PLATFORM)/lib/libcrypto.a",
+					"../GitUpKit/Third-Party/libssh2/$(GITUP_PLATFORM)/lib/libssh2.a",
 				);
 				PRODUCT_NAME = gitup;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -542,16 +694,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_VERSION = 0;
-				BUNDLE_VERSION_STRING = 1.0.7;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = 6L38SZDJ22;
+				BUNDLE_VERSION_STRING = 1.1;
+				CODE_SIGN_ENTITLEMENTS = Application/GitUp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = CATN5JG2W2;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Third-Party";
-				GCC_DYNAMIC_NO_PIC = YES;
 				INFOPLIST_FILE = Application/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "co.gitup.mac-debug";
 				PRODUCT_NAME = GitUp;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -560,14 +714,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BUNDLE_VERSION = 0;
-				BUNDLE_VERSION_STRING = 1.0.7;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = 6L38SZDJ22;
+				BUNDLE_VERSION_STRING = 1.1;
+				CODE_SIGN_ENTITLEMENTS = Application/GitUp.entitlements;
+				DEVELOPMENT_TEAM = CATN5JG2W2;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/Third-Party";
-				GCC_DYNAMIC_NO_PIC = YES;
 				INFOPLIST_FILE = Application/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				OTHER_LDFLAGS = "-Wl,-rpath,@loader_path/../Frameworks";
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = co.gitup.mac;
 				PRODUCT_NAME = GitUp;
 			};

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -13,194 +13,117 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#import <Security/Security.h>
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wobjc-interface-ivars"
-#import <HockeySDK/HockeySDK.h>
 #pragma clang diagnostic pop
 #import <Sparkle/Sparkle.h>
 
+#import <GitUpKit/GitUpKit.h>
 #import <GitUpKit/XLFacilityMacros.h>
 
 #import "AppDelegate.h"
+#import "ServicesProvider.h"
 #import "DocumentController.h"
 #import "Document.h"
 #import "Common.h"
 #import "ToolProtocol.h"
 #import "GARawTracker.h"
 
+#import "AboutWindowController.h"
+#import "CloneWindowController.h"
+#import "PreferencesWindowController.h"
+#import "WelcomeWindowController.h"
+
 #define __ENABLE_SUDDEN_TERMINATION__ 1
 
 #define kNotificationUserInfoKey_Action @"action"  // NSString
-
-#define kPreferencePaneIdentifier_General @"general"
-
-#define kWelcomeWindowCornerRadius 10
 
 #define kInstallerName @"install.sh"
 #define kToolName @"gitup"
 #define kToolInstallPath @"/usr/local/bin/" kToolName
 
-@interface NSSavePanel (OSX_10_9)
-- (void)setShowsTagField:(BOOL)flag;
-@end
-
-@interface WelcomeView : NSView
-@end
-
 @interface AppDelegate () <NSUserNotificationCenterDelegate, SUUpdaterDelegate>
-- (IBAction)closeWelcomeWindow:(id)sender;
-@end
-
-@implementation WelcomeView
-
-- (void)drawRect:(NSRect)dirtyRect {
-  NSRect bounds = self.bounds;
-  CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-
-  CGContextClearRect(context, dirtyRect);
-
-  CGContextSetRGBFillColor(context, 0.9, 0.9, 0.9, 1.0);
-  GICGContextAddRoundedRect(context, bounds, kWelcomeWindowCornerRadius);
-  CGContextFillPath(context);
-}
-
-@end
-
-@interface WelcomeWindow : NSWindow
-@end
-
-@implementation WelcomeWindow
-
-- (BOOL)validateMenuItem:(NSMenuItem*)menuItem {
-  return menuItem.action == @selector(performClose:) ? YES : [super validateMenuItem:menuItem];
-}
-
-- (void)performClose:(id)sender {
-  [[AppDelegate sharedDelegate] closeWelcomeWindow:sender];
-}
-
-- (BOOL)canBecomeKeyWindow {
-  return YES;
-}
-
+@property(nonatomic, strong) AboutWindowController* aboutWindowController;
+@property(nonatomic, strong) CloneWindowController* cloneWindowController;
+@property(nonatomic, strong) PreferencesWindowController* preferencesWindowController;
+@property(nonatomic, strong) WelcomeWindowController* welcomeWindowController;
 @end
 
 @implementation AppDelegate {
   SUUpdater* _updater;
   BOOL _updatePending;
   BOOL _manualCheck;
-  NSInteger _allowWelcome;
-  CGFloat _welcomeMaxHeight;
-
-  BOOL _authenticationUseKeychain;
-  NSURL* _authenticationURL;
-  NSString* _authenticationUsername;
-  NSString* _authenticationPassword;
 
   CFMessagePortRef _messagePort;
 }
 
+#pragma mark - Properties
+
+- (AboutWindowController*)aboutWindowController {
+  if (!_aboutWindowController) {
+    _aboutWindowController = [[AboutWindowController alloc] init];
+  }
+  return _aboutWindowController;
+}
+
+- (CloneWindowController*)cloneWindowController {
+  if (!_cloneWindowController) {
+    _cloneWindowController = [[CloneWindowController alloc] init];
+  }
+  return _cloneWindowController;
+}
+
+- (void)didChangeReleaseChannel:(BOOL)didChange {
+  if (didChange) {
+    _manualCheck = NO;
+    [_updater checkForUpdatesInBackground];
+  }
+}
+
+- (PreferencesWindowController*)preferencesWindowController {
+  if (!_preferencesWindowController) {
+    _preferencesWindowController = [[PreferencesWindowController alloc] init];
+    __weak typeof(self) weakSelf = self;
+    _preferencesWindowController.didChangeReleaseChannel = ^(BOOL didChange) {
+      [weakSelf didChangeReleaseChannel:didChange];
+    };
+  }
+  return _preferencesWindowController;
+}
+
+- (WelcomeWindowController*)welcomeWindowController {
+  if (!_welcomeWindowController) {
+    _welcomeWindowController = [[WelcomeWindowController alloc] init];
+
+    _welcomeWindowController.keyShouldShowWindow = kUserDefaultsKey_ShowWelcomeWindow;
+
+    __weak typeof(self) weakSelf = self;
+    _welcomeWindowController.openDocumentAtURL = ^(NSURL* _Nonnull url) {
+      [weakSelf _openDocumentAtURL:url];
+    };
+  }
+  return _welcomeWindowController;
+}
+
+#pragma mark - Initialize
 + (void)initialize {
   NSDictionary* defaults = @{
     GICommitMessageViewUserDefaultKey_ShowInvisibleCharacters : @(YES),
     GICommitMessageViewUserDefaultKey_ShowMargins : @(YES),
     GICommitMessageViewUserDefaultKey_EnableSpellChecking : @(YES),
-    kUserDefaultsKey_ReleaseChannel : kReleaseChannel_Stable,
+    GIUserDefaultKey_FontSize : @(GIDefaultFontSize),
+    kUserDefaultsKey_ReleaseChannel : PreferencesWindowController_ReleaseChannel_Stable,
     kUserDefaultsKey_CheckInterval : @(15 * 60),
     kUserDefaultsKey_FirstLaunch : @(YES),
     kUserDefaultsKey_DiffWhitespaceMode : @(kGCLiveRepositoryDiffWhitespaceMode_Normal),
-    kUserDefaultsKey_EnableVisualEffects : @(NO),
     kUserDefaultsKey_ShowWelcomeWindow : @(YES),
+    kUserDefaultsKey_Theme : PreferencesWindowController_Theme_SystemPreference,
   };
   [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
 + (instancetype)sharedDelegate {
   return (AppDelegate*)[NSApp delegate];
-}
-
-// WARNING: We are using the same attributes for the keychain items than Git CLT appears to be using as of version 1.9.3
-+ (BOOL)loadPlainTextAuthenticationFormKeychainForURL:(NSURL*)url user:(NSString*)user username:(NSString**)username password:(NSString**)password allowInteraction:(BOOL)allowInteraction {
-  const char* serverName = url.host.UTF8String;
-  if (serverName && serverName[0]) {  // TODO: How can this be NULL?
-    const char* accountName = (*username).UTF8String;
-    SecKeychainItemRef itemRef;
-    UInt32 passwordLength;
-    void* passwordData;
-    SecKeychainSetUserInteractionAllowed(allowInteraction);  // Ignore errors
-    OSStatus status = SecKeychainFindInternetPassword(NULL,
-                                                      (UInt32)strlen(serverName), serverName,
-                                                      0, NULL,  // Any security domain
-                                                      accountName ? (UInt32)strlen(accountName) : 0, accountName,
-                                                      0, NULL,  // Any path
-                                                      0,  // Any port
-                                                      kSecProtocolTypeAny,
-                                                      kSecAuthenticationTypeAny,
-                                                      &passwordLength, &passwordData, &itemRef);
-    if (status == noErr) {
-      BOOL success = NO;
-      *password = [[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding];
-      if (accountName == NULL) {
-        UInt32 tag = kSecAccountItemAttr;
-        UInt32 format = CSSM_DB_ATTRIBUTE_FORMAT_STRING;
-        SecKeychainAttributeInfo info = {1, &tag, &format};
-        SecKeychainAttributeList* attributes;
-        status = SecKeychainItemCopyAttributesAndData(itemRef, &info, NULL, &attributes, NULL, NULL);
-        if (status == noErr) {
-          XLOG_DEBUG_CHECK(attributes->count == 1);
-          XLOG_DEBUG_CHECK(attributes->attr[0].tag == kSecAccountItemAttr);
-          *username = [[NSString alloc] initWithBytes:attributes->attr[0].data length:attributes->attr[0].length encoding:NSUTF8StringEncoding];
-          success = YES;
-          SecKeychainItemFreeAttributesAndData(attributes, NULL);
-        } else {
-          XLOG_ERROR(@"SecKeychainItemCopyAttributesAndData() returned error %i", status);
-        }
-      } else {
-        success = YES;
-      }
-      SecKeychainItemFreeContent(NULL, passwordData);
-      CFRelease(itemRef);
-      if (success) {
-        return YES;
-      }
-    } else if (status != errSecItemNotFound) {
-      XLOG_ERROR(@"SecKeychainFindInternetPassword() returned error %i", status);
-    }
-  } else {
-    XLOG_WARNING(@"Unable to extract hostname from remote URL: %@", url);
-  }
-  return NO;
-}
-
-+ (void)savePlainTextAuthenticationToKeychainForURL:(NSURL*)url withUsername:(NSString*)username password:(NSString*)password {
-  SecProtocolType type;
-  if ([url.scheme isEqualToString:@"http"]) {
-    type = kSecProtocolTypeHTTP;
-  } else if ([url.scheme isEqualToString:@"https"]) {
-    type = kSecProtocolTypeHTTPS;
-  } else {
-    XLOG_DEBUG_UNREACHABLE();
-    return;
-  }
-  const char* serverName = url.host.UTF8String;
-  const char* accountName = username.UTF8String;
-  const char* accountPassword = password.UTF8String;
-  SecKeychainSetUserInteractionAllowed(true);  // Ignore errors
-  OSStatus status = SecKeychainAddInternetPassword(NULL,
-                                                   (UInt32)strlen(serverName), serverName,
-                                                   0, NULL,  // Any security domain
-                                                   accountName ? (UInt32)strlen(accountName) : 0, accountName,
-                                                   0, NULL,  // Any path
-                                                   0,  // Any port
-                                                   type,
-                                                   kSecAuthenticationTypeAny,
-                                                   (UInt32)strlen(accountPassword), accountPassword, NULL);
-  if (status != noErr) {
-    XLOG_ERROR(@"SecKeychainAddInternetPassword() returned error %i", status);
-  } else {
-    XLOG_VERBOSE(@"Successfully saved authentication in Keychain");
-  }
 }
 
 - (void)_setDocumentWindowModeID:(NSArray*)arguments {
@@ -211,7 +134,6 @@
   [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
                                                                          display:YES
                                                                completionHandler:^(NSDocument* document, BOOL documentWasAlreadyOpen, NSError* openError) {
-
                                                                  if (document) {
                                                                    if (documentWasAlreadyOpen) {
                                                                      if ((NSUInteger)windowModeID != NSNotFound) {
@@ -227,79 +149,15 @@
                                                                  } else {
                                                                    [[NSDocumentController sharedDocumentController] presentError:openError];
                                                                  }
-
                                                                }];
 }
 
-- (void)_openDocument:(NSMenuItem*)sender {
-  [self _openRepositoryWithURL:sender.representedObject withCloneMode:kCloneMode_None windowModeID:NSNotFound];
+- (void)_openDocumentAtURL:(NSURL*)url {
+  [self _openRepositoryWithURL:url withCloneMode:kCloneMode_None windowModeID:NSNotFound];
 }
 
-- (void)_willShowRecentPopUpMenu:(NSNotification*)notification {
-  NSMenu* menu = _recentPopUpButton.menu;
-  while (menu.numberOfItems > 1) {
-    [menu removeItemAtIndex:1];
-  }
-  NSArray* array = [[NSDocumentController sharedDocumentController] recentDocumentURLs];
-  if (array.count) {
-    for (NSURL* url in array) {
-      NSString* path = url.path;
-      NSString* title = path.lastPathComponent;
-      for (NSMenuItem* item in menu.itemArray) {  // TODO: Handle identical second-to-last path component
-        if ([item.title caseInsensitiveCompare:title] == NSOrderedSame) {
-          title = [NSString stringWithFormat:@"%@ — %@", path.lastPathComponent, [[path stringByDeletingLastPathComponent] lastPathComponent]];
-          path = [(NSURL*)item.representedObject path];
-          item.title = [NSString stringWithFormat:@"%@ — %@", path.lastPathComponent, [[path stringByDeletingLastPathComponent] lastPathComponent]];
-          break;
-        }
-      }
-      NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:@selector(_openDocument:) keyEquivalent:@""];
-      item.target = self;
-      item.representedObject = url;
-      [menu addItem:item];
-    }
-  } else {
-    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"No Repositories", nil) action:NULL keyEquivalent:@""];
-    item.enabled = NO;
-    [menu addItem:item];
-  }
-}
-
-- (void)awakeFromNib {
-  _welcomeMaxHeight = _welcomeWindow.frame.size.height;
-
-  _allowWelcome = -1;
-
-  _welcomeWindow.alphaValue = 1.0;
-  _welcomeWindow.opaque = NO;
-  _welcomeWindow.movableByWindowBackground = YES;
-
-  _twitterButton.textAlignment = NSLeftTextAlignment;
-  _twitterButton.textFont = [NSFont boldSystemFontOfSize:11];
-  _forumsButton.textAlignment = NSLeftTextAlignment;
-  _forumsButton.textFont = [NSFont boldSystemFontOfSize:11];
-
-  _preferencesToolbar.selectedItemIdentifier = kPreferencePaneIdentifier_General;
-  [self selectPreferencePane:nil];
-
-  [_channelPopUpButton.menu removeAllItems];
-  for (NSString* string in @[ kReleaseChannel_Stable, kReleaseChannel_Continuous ]) {
-    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(string, nil) action:NULL keyEquivalent:@""];
-    item.representedObject = string;
-    [_channelPopUpButton.menu addItem:item];
-  }
-
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_willShowRecentPopUpMenu:) name:NSPopUpButtonWillPopUpNotification object:_recentPopUpButton];
-}
-
-- (void)_updatePreferencePanel {
-  NSString* channel = [[NSUserDefaults standardUserDefaults] stringForKey:kUserDefaultsKey_ReleaseChannel];
-  for (NSMenuItem* item in _channelPopUpButton.menu.itemArray) {
-    if ([item.representedObject isEqualToString:channel]) {
-      [_channelPopUpButton selectItem:item];
-      break;
-    }
-  }
+- (void)handleDocumentCountChanged {
+  [self.welcomeWindowController handleDocumentCountChanged];
 }
 
 - (void)_showNotificationWithTitle:(NSString*)title action:(SEL)action message:(NSString*)format, ... NS_FORMAT_FUNCTION(3, 4) {
@@ -317,19 +175,6 @@
   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-- (void)handleDocumentCountChanged {
-  BOOL showWelcomeWindow = [[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsKey_ShowWelcomeWindow];
-  if (showWelcomeWindow && (_allowWelcome > 0) && ![[[NSDocumentController sharedDocumentController] documents] count]) {
-    if (!_welcomeWindow.visible) {
-      [_welcomeWindow makeKeyAndOrderFront:nil];
-    }
-  } else {
-    if (_welcomeWindow.visible) {
-      [_welcomeWindow orderOut:nil];
-    }
-  }
-}
-
 #pragma mark - NSApplicationDelegate
 
 - (void)applicationWillFinishLaunching:(NSNotification*)notification {
@@ -337,15 +182,14 @@
   [DocumentController sharedDocumentController];
 
 #if !DEBUG
-  // Initialize HockeyApp
-  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"65233b0e034e4fcbaf6754afba3b2b23"];
-  [[BITHockeyManager sharedHockeyManager] setDisableMetricsManager:YES];
-  [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
-  [[BITHockeyManager sharedHockeyManager] startManager];
-
   // Initialize Google Analytics
   [[GARawTracker sharedTracker] startWithTrackingID:@"UA-83409580-1"];
 #endif
+
+  [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                     andSelector:@selector(_getUrl:withReplyEvent:)
+                                                   forEventClass:kInternetEventClass
+                                                      andEventID:kAEGetURL];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification {
@@ -363,8 +207,14 @@
   }
 #endif
 
+  // Locate installed apps.
+  [GILaunchServicesLocator setup];
+
   // Initialize user notification center
   [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+
+  // Register finder context menu services.
+  [NSApplication sharedApplication].servicesProvider = [ServicesProvider new];
 
   // Notify user in case app was updated since last launch
   NSString* currentVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
@@ -382,14 +232,14 @@
   // Prompt to install command line tool if needed
   if (![[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsKey_FirstLaunch] && ![[NSUserDefaults standardUserDefaults] boolForKey:kUserDefaultsKey_SkipInstallCLT]) {
     if (![[NSFileManager defaultManager] isExecutableFileAtPath:kToolInstallPath]) {
-      NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"Install GitUp command line tool?", nil)
-                                       defaultButton:NSLocalizedString(@"Install", nil)
-                                     alternateButton:NSLocalizedString(@"Not Now", nil)
-                                         otherButton:nil
-                           informativeTextWithFormat:NSLocalizedString(@"GitUp can install a companion command line tool at \"%@\" which lets you control GitUp from the terminal.\n\nYou can install it at any time from the GitUp menu.", nil), kToolInstallPath];
+      NSAlert* alert = [[NSAlert alloc] init];
+      alert.messageText = NSLocalizedString(@"Install GitUp command line tool?", nil);
+      alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"GitUp can install a companion command line tool at \"%@\" which lets you control GitUp from the terminal.\n\nYou can install it at any time from the GitUp menu.", nil), kToolInstallPath];
+      [alert addButtonWithTitle:NSLocalizedString(@"Install", nil)];
+      [alert addButtonWithTitle:NSLocalizedString(@"Not Now", nil)];
       alert.type = kGIAlertType_Note;
       alert.showsSuppressionButton = YES;
-      if ([alert runModal] == NSAlertDefaultReturn) {
+      if ([alert runModal] == NSAlertFirstButtonReturn) {
         [self installTool:nil];
       }
       if (alert.suppressionButton.state) {
@@ -408,6 +258,7 @@
     CFRunLoopSourceRef source = CFMessagePortCreateRunLoopSource(kCFAllocatorDefault, _messagePort, 0);
     if (source) {
       CFRunLoopAddSource(CFRunLoopGetMain(), source, kCFRunLoopDefaultMode);  // Don't use kCFRunLoopCommonModes on purpose
+      CFRelease(source);
     } else {
       XLOG_DEBUG_UNREACHABLE();
     }
@@ -416,10 +267,23 @@
     XLOG_DEBUG_UNREACHABLE();
   }
 
+  // Load theme preference
+  [PreferencesThemeService applySelectedTheme];
+
 #if __ENABLE_SUDDEN_TERMINATION__
   // Enable sudden termination
   [[NSProcessInfo processInfo] enableSuddenTermination];
 #endif
+}
+
+- (void)_getUrl:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
+  NSURL* url = [NSURL URLWithString:[event paramDescriptorForKeyword:keyDirectObject].stringValue];
+  BOOL isGitHubMacScheme = [url.scheme rangeOfString:@"github-mac" options:NSCaseInsensitiveSearch].location != NSNotFound;
+  BOOL isOpenRepoHost = [url.host rangeOfString:@"openRepo" options:NSCaseInsensitiveSearch].location != NSNotFound;
+  NSString* path = url.path.length ? [url.path substringFromIndex:1] : nil;
+  if (isGitHubMacScheme && isOpenRepoHost && path) {
+    [self _cloneRepositoryFromURLString:path];
+  }
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication*)sender {
@@ -428,18 +292,18 @@
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows {
   if (!hasVisibleWindows) {
-    _allowWelcome = 1;  // Always show welcome when clicking on dock icon
+    // Always show welcome when clicking on dock icon
+    [self.welcomeWindowController setShouldShow];
     [self handleDocumentCountChanged];
   }
   return YES;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification*)notification {
-  if (_allowWelcome < 0) {
-    _allowWelcome = 1;
+  if (self.welcomeWindowController.notActivedYet) {
+    [self.welcomeWindowController setShouldShow];
   }
   [self handleDocumentCountChanged];
-
 #if !DEBUG
   [[GARawTracker sharedTracker] sendEventWithCategory:@"application"
                                                action:@"activate"
@@ -471,14 +335,20 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   XLOG_DEBUG_CHECK(input);
   NSDictionary* output = [(__bridge AppDelegate*)info _processToolCommand:input];
   XLOG_DEBUG_CHECK(output);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+  // The deprecation for this method in the macOS 10.14 SDK marks the incorrect
+  // version for its introduction. However, it is useful to keep availability
+  // guards on in general. FB6233110
   return CFBridgingRetain([NSKeyedArchiver archivedDataWithRootObject:output]);
+#pragma clang diagnostic pop
 }
 
 - (NSDictionary*)_processToolCommand:(NSDictionary*)input {
   NSString* command = [input objectForKey:kToolDictionaryKey_Command];
   NSString* repository = [[input objectForKey:kToolDictionaryKey_Repository] stringByStandardizingPath];
   if (!command.length || !repository.length) {
-    return @{ kToolDictionaryKey_Error : @"Invalid command" };
+    return @{kToolDictionaryKey_Error : @"Invalid command"};
   }
   if ([command isEqualToString:@kToolCommand_Open]) {
     [self _openRepositoryWithURL:[NSURL fileURLWithPath:repository] withCloneMode:kCloneMode_None windowModeID:NSNotFound];
@@ -489,7 +359,7 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   } else if ([command isEqualToString:@kToolCommand_Stash]) {
     [self _openRepositoryWithURL:[NSURL fileURLWithPath:repository] withCloneMode:kCloneMode_None windowModeID:kWindowModeID_Stashes];
   } else {
-    return @{ kToolDictionaryKey_Error : [NSString stringWithFormat:@"Unknown command '%@'", command] };
+    return @{kToolDictionaryKey_Error : [NSString stringWithFormat:@"Unknown command '%@'", command]};
   }
   return @{};
 }
@@ -507,17 +377,6 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   [[NSDocumentController sharedDocumentController] openDocument:sender];
 }
 
-- (IBAction)changeReleaseChannel:(id)sender {
-  NSString* oldChannel = [[NSUserDefaults standardUserDefaults] stringForKey:kUserDefaultsKey_ReleaseChannel];
-  NSString* newChannel = _channelPopUpButton.selectedItem.representedObject;
-  if (![newChannel isEqualToString:oldChannel]) {
-    [[NSUserDefaults standardUserDefaults] setObject:newChannel forKey:kUserDefaultsKey_ReleaseChannel];
-
-    _manualCheck = NO;
-    [_updater checkForUpdatesInBackground];
-  }
-}
-
 - (IBAction)viewWiki:(id)sender {
   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:kURL_Wiki]];
 }
@@ -531,37 +390,12 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
 }
 
 - (IBAction)showAboutPanel:(id)sender {
-#if DEBUG
-  _versionTextField.stringValue = @"DEBUG";
-#else
-  if (_updatePending) {
-    _versionTextField.stringValue = NSLocalizedString(@"Update Pending", nil);
-  } else {
-    _versionTextField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Version %@ (%@)", nil), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"], [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-  }
-#endif
-  _copyrightTextField.stringValue = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSHumanReadableCopyright"];
-  [_aboutPanel makeKeyAndOrderFront:nil];
+  self.aboutWindowController.updatePending = _updatePending;
+  [self.aboutWindowController showWindow:nil];
 }
 
 - (IBAction)showPreferences:(id)sender {
-  [self _updatePreferencePanel];
-  [_preferencesWindow makeKeyAndOrderFront:nil];
-}
-
-- (IBAction)selectPreferencePane:(id)sender {
-  [_preferencesTabView selectTabViewItemWithIdentifier:_preferencesToolbar.selectedItemIdentifier];
-  NSSize size = NSSizeFromString(_preferencesTabView.selectedTabViewItem.label);
-  NSRect rect = [_preferencesWindow contentRectForFrameRect:_preferencesWindow.frame];
-  if (sender) {
-    rect.origin.y += rect.size.height;
-  }
-  rect.size.width = size.width;
-  rect.size.height = size.height;
-  if (sender) {
-    rect.origin.y -= rect.size.height;
-  }
-  [_preferencesWindow setFrame:[_preferencesWindow frameRectForContentRect:rect] display:YES animate:(sender ? YES : NO)];
+  [self.preferencesWindowController showWindow:nil];
 }
 
 - (IBAction)resetPreferences:(id)sender {
@@ -573,9 +407,7 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   savePanel.title = NSLocalizedString(@"Create New Repository", nil);
   savePanel.prompt = NSLocalizedString(@"Create", nil);
   savePanel.nameFieldLabel = NSLocalizedString(@"Name:", nil);
-  if ([savePanel respondsToSelector:@selector(setShowsTagField:)]) {
-    [savePanel setShowsTagField:NO];
-  }
+  savePanel.showsTagField = NO;
   if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
     NSString* path = savePanel.URL.path;
     NSError* error;
@@ -592,44 +424,47 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   }
 }
 
+- (void)_cloneRepositoryFromURLString:(NSString*)urlString {
+  [self.cloneWindowController runModalForURL:urlString
+                                  completion:^(CloneWindowControllerResult* _Nonnull result) {
+                                    if (result.invalidRepository) {
+                                      [NSApp presentError:MAKE_ERROR(@"Invalid Git repository URL")];
+                                      return;
+                                    }
+
+                                    if (result.emptyDirectoryPath) {
+                                      return;
+                                    }
+
+                                    NSURL* url = result.repositoryURL;
+                                    NSString* path = result.directoryPath;
+                                    CloneMode cloneMode = result.recursive ? kCloneMode_Recursive : kCloneMode_Default;
+                                    NSError* error;
+
+                                    BOOL fileDoesntExistOrEvictedToTrash = ![[NSFileManager defaultManager] fileExistsAtPath:path followLastSymlink:NO] || [[NSFileManager defaultManager] moveItemAtPathToTrash:path error:&error];
+
+                                    if (!fileDoesntExistOrEvictedToTrash) {
+                                      [NSApp presentError:error];
+                                      return;
+                                    }
+
+                                    GCRepository* repository = [[GCRepository alloc] initWithNewLocalRepository:path bare:NO error:&error];
+                                    if (!repository) {
+                                      [NSApp presentError:error];
+                                      return;
+                                    }
+
+                                    if ([repository addRemoteWithName:@"origin" url:url error:&error]) {
+                                      [self _openRepositoryWithURL:[NSURL fileURLWithPath:repository.workingDirectoryPath] withCloneMode:cloneMode windowModeID:NSNotFound];
+                                    } else {
+                                      [NSApp presentError:error];
+                                      [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];  // Ignore errors
+                                    }
+                                  }];
+}
+
 - (IBAction)cloneRepository:(id)sender {
-  _cloneURLTextField.stringValue = @"";
-  _cloneRecursiveButton.state = NSOnState;
-  if ([NSApp runModalForWindow:_cloneWindow] && _cloneURLTextField.stringValue.length) {
-    NSURL* url = GCURLFromGitURL(_cloneURLTextField.stringValue);
-    if (url) {
-      NSString* name = [url.path.lastPathComponent stringByDeletingPathExtension];
-      NSSavePanel* savePanel = [NSSavePanel savePanel];
-      savePanel.title = NSLocalizedString(@"Clone Repository", nil);
-      savePanel.prompt = NSLocalizedString(@"Clone", nil);
-      savePanel.nameFieldLabel = NSLocalizedString(@"Name:", nil);
-      savePanel.nameFieldStringValue = name ? name : @"";
-      if ([savePanel respondsToSelector:@selector(setShowsTagField:)]) {
-        [savePanel setShowsTagField:NO];
-      }
-      if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
-        NSString* path = savePanel.URL.path;
-        NSError* error;
-        if (![[NSFileManager defaultManager] fileExistsAtPath:path followLastSymlink:NO] || [[NSFileManager defaultManager] moveItemAtPathToTrash:path error:&error]) {
-          GCRepository* repository = [[GCRepository alloc] initWithNewLocalRepository:path bare:NO error:&error];
-          if (repository) {
-            if ([repository addRemoteWithName:@"origin" url:url error:&error]) {
-              [self _openRepositoryWithURL:[NSURL fileURLWithPath:repository.workingDirectoryPath] withCloneMode:(_cloneRecursiveButton.state ? kCloneMode_Recursive : kCloneMode_Default) windowModeID:NSNotFound];
-            } else {
-              [NSApp presentError:error];
-              [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];  // Ignore errors
-            }
-          } else {
-            [NSApp presentError:error];
-          }
-        } else {
-          [NSApp presentError:error];
-        }
-      }
-    } else {
-      [NSApp presentError:MAKE_ERROR(@"Invalid Git repository URL")];
-    }
-  }
+  [self _cloneRepositoryFromURLString:@""];
 }
 
 - (IBAction)dimissModal:(id)sender {
@@ -640,15 +475,6 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
 - (IBAction)checkForUpdates:(id)sender {
   _manualCheck = YES;
   [_updater checkForUpdatesInBackground];
-}
-
-- (IBAction)closeWelcomeWindow:(id)sender {
-  [_welcomeWindow orderOut:nil];
-  _allowWelcome = 0;
-}
-
-- (IBAction)openTwitter:(id)sender {
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:kURL_Twitter]];
 }
 
 - (IBAction)installTool:(id)sender {
@@ -679,11 +505,10 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
           [data appendBytes:buffer length:count];
         }
         if ((data.length == 2) && (((const char*)data.bytes)[0] == 'O') && (((const char*)data.bytes)[1] == 'K')) {
-          NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"GitUp command line tool was successfully installed!", nil)
-                                           defaultButton:NSLocalizedString(@"OK", nil)
-                                         alternateButton:nil
-                                             otherButton:nil
-                               informativeTextWithFormat:NSLocalizedString(@"The tool has been installed at \"%@\".\nRun \"gitup help\" in Terminal to learn more.", nil), kToolInstallPath];
+          NSAlert* alert = [[NSAlert alloc] init];
+          alert.messageText = NSLocalizedString(@"GitUp command line tool was successfully installed!", nil);
+          alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"The tool has been installed at \"%@\".\nRun \"gitup help\" in Terminal to learn more.", nil), kToolInstallPath];
+          [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
           alert.type = kGIAlertType_Note;
           [alert runModal];
         } else {
@@ -711,49 +536,6 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   }
 }
 
-#pragma mark - GCRepositoryDelegate
-
-- (void)repository:(GCRepository*)repository willStartTransferWithURL:(NSURL*)url {
-  _authenticationUseKeychain = YES;
-  _authenticationURL = nil;
-  _authenticationUsername = nil;
-  _authenticationPassword = nil;
-}
-
-- (BOOL)repository:(GCRepository*)repository requiresPlainTextAuthenticationForURL:(NSURL*)url user:(NSString*)user username:(NSString**)username password:(NSString**)password {
-  if (_authenticationUseKeychain) {
-    _authenticationUseKeychain = NO;
-    if ([self.class loadPlainTextAuthenticationFormKeychainForURL:url user:user username:username password:password allowInteraction:YES]) {
-      return YES;
-    }
-  } else {
-    XLOG_VERBOSE(@"Skipping Keychain lookup for repeated authentication failures");
-  }
-
-  _authenticationURLTextField.stringValue = url.absoluteString;
-  _authenticationNameTextField.stringValue = *username ? *username : @"";
-  _authenticationPasswordTextField.stringValue = @"";
-  [_authenticationWindow makeFirstResponder:(*username ? _authenticationPasswordTextField : _authenticationNameTextField)];
-  if ([NSApp runModalForWindow:_authenticationWindow] && _authenticationNameTextField.stringValue.length && _authenticationPasswordTextField.stringValue.length) {
-    _authenticationURL = url;
-    _authenticationUsername = [_authenticationNameTextField.stringValue copy];
-    _authenticationPassword = [_authenticationPasswordTextField.stringValue copy];
-    *username = _authenticationNameTextField.stringValue;
-    *password = _authenticationPasswordTextField.stringValue;
-    return YES;
-  }
-  return NO;
-}
-
-- (void)repository:(GCRepository*)repository didFinishTransferWithURL:(NSURL*)url success:(BOOL)success {
-  if (success && _authenticationURL && _authenticationUsername && _authenticationPassword) {
-    [self.class savePlainTextAuthenticationToKeychainForURL:_authenticationURL withUsername:_authenticationUsername password:_authenticationPassword];
-  }
-  _authenticationURL = nil;
-  _authenticationUsername = nil;
-  _authenticationPassword = nil;
-}
-
 #pragma mark - SUUpdaterDelegate
 
 - (NSString*)feedURLStringForUpdater:(SUUpdater*)updater {
@@ -765,11 +547,10 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   NSString* channel = [[NSUserDefaults standardUserDefaults] stringForKey:kUserDefaultsKey_ReleaseChannel];
   XLOG_INFO(@"Did find app update on channel '%@' for version %@", channel, item.versionString);
   if (_manualCheck) {
-    NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"A GitUp update is available!", nil)
-                                     defaultButton:NSLocalizedString(@"OK", nil)
-                                   alternateButton:nil
-                                       otherButton:nil
-                         informativeTextWithFormat:NSLocalizedString(@"The update will download automatically in the background and be installed when you quit GitUp.", nil)];
+    NSAlert* alert = [[NSAlert alloc] init];
+    alert.messageText = NSLocalizedString(@"A GitUp update is available!", nil);
+    alert.informativeText = NSLocalizedString(@"The update will download automatically in the background and be installed when you quit GitUp.", nil);
+    [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     alert.type = kGIAlertType_Note;
     [alert runModal];
   }
@@ -779,11 +560,9 @@ static CFDataRef _MessagePortCallBack(CFMessagePortRef local, SInt32 msgid, CFDa
   NSString* channel = [[NSUserDefaults standardUserDefaults] stringForKey:kUserDefaultsKey_ReleaseChannel];
   XLOG_VERBOSE(@"App is up-to-date at version %@ on channel '%@'", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], channel);
   if (_manualCheck) {
-    NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"GitUp is already up-to-date!", nil)
-                                     defaultButton:NSLocalizedString(@"OK", nil)
-                                   alternateButton:nil
-                                       otherButton:nil
-                         informativeTextWithFormat:@""];
+    NSAlert* alert = [[NSAlert alloc] init];
+    alert.messageText = NSLocalizedString(@"GitUp is already up-to-date!", nil);
+    [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     alert.type = kGIAlertType_Note;
     [alert runModal];
   }

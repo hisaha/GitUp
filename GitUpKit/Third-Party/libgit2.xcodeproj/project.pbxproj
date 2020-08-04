@@ -263,6 +263,14 @@
 		E21751851B912B8E00BE234A /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = E21751601B912B8E00BE234A /* http_parser.c */; };
 		E228B2B31CA997DD00A026FC /* merge_driver.c in Sources */ = {isa = PBXBuildFile; fileRef = E228B2B11CA997DD00A026FC /* merge_driver.c */; };
 		E228B2B41CA997DD00A026FC /* merge_driver.c in Sources */ = {isa = PBXBuildFile; fileRef = E228B2B11CA997DD00A026FC /* merge_driver.c */; };
+		E2B332B22027906300CD10B3 /* idxmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B12027906300CD10B3 /* idxmap.c */; };
+		E2B332B32027906300CD10B3 /* idxmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B12027906300CD10B3 /* idxmap.c */; };
+		E2B332B52027908C00CD10B3 /* oidmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B42027908C00CD10B3 /* oidmap.c */; };
+		E2B332B62027908C00CD10B3 /* oidmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B42027908C00CD10B3 /* oidmap.c */; };
+		E2B332B8202790A400CD10B3 /* offmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B7202790A400CD10B3 /* offmap.c */; };
+		E2B332B9202790A400CD10B3 /* offmap.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332B7202790A400CD10B3 /* offmap.c */; };
+		E2B332BC202790C000CD10B3 /* worktree.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332BB202790C000CD10B3 /* worktree.c */; };
+		E2B332BD202790C000CD10B3 /* worktree.c in Sources */ = {isa = PBXBuildFile; fileRef = E2B332BB202790C000CD10B3 /* worktree.c */; };
 		E2DC02F51E126E0F00CC091F /* proxy.c in Sources */ = {isa = PBXBuildFile; fileRef = E2DC02F31E126E0F00CC091F /* proxy.c */; };
 		E2DC02F61E126E0F00CC091F /* proxy.c in Sources */ = {isa = PBXBuildFile; fileRef = E2DC02F31E126E0F00CC091F /* proxy.c */; };
 		E2DC02F91E126E3E00CC091F /* apply.c in Sources */ = {isa = PBXBuildFile; fileRef = E2DC02F71E126E3E00CC091F /* apply.c */; };
@@ -282,6 +290,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB72906522C83EB1007AB8F7 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		DB72906622C83EB1007AB8F7 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		DB72906722C83EB1007AB8F7 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		E2174BD51B91240400BE234A /* libgit2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgit2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2174C5E1B9125C500BE234A /* libgit2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libgit2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2174F2B1B912B6B00BE234A /* annotated_commit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = annotated_commit.c; sourceTree = "<group>"; };
@@ -596,6 +607,13 @@
 		E21752EC1B914B9600BE234A /* git2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = git2.h; sourceTree = "<group>"; };
 		E228B2B11CA997DD00A026FC /* merge_driver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = merge_driver.c; sourceTree = "<group>"; };
 		E228B2B21CA997DD00A026FC /* merge_driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = merge_driver.h; sourceTree = "<group>"; };
+		E2B332B02027906200CD10B3 /* idxmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = idxmap.h; sourceTree = "<group>"; };
+		E2B332B12027906300CD10B3 /* idxmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = idxmap.c; sourceTree = "<group>"; };
+		E2B332B42027908C00CD10B3 /* oidmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = oidmap.c; sourceTree = "<group>"; };
+		E2B332B7202790A400CD10B3 /* offmap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = offmap.c; sourceTree = "<group>"; };
+		E2B332BA202790C000CD10B3 /* worktree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = worktree.h; sourceTree = "<group>"; };
+		E2B332BB202790C000CD10B3 /* worktree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = worktree.c; sourceTree = "<group>"; };
+		E2B332BE202790DF00CD10B3 /* hash_collisiondetect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hash_collisiondetect.h; sourceTree = "<group>"; };
 		E2DC02F31E126E0F00CC091F /* proxy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = proxy.c; sourceTree = "<group>"; };
 		E2DC02F41E126E0F00CC091F /* proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = proxy.h; sourceTree = "<group>"; };
 		E2DC02F71E126E3E00CC091F /* apply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = apply.c; sourceTree = "<group>"; };
@@ -638,12 +656,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DB72906422C83EB1007AB8F7 /* Xcode-Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				DB72906522C83EB1007AB8F7 /* Debug.xcconfig */,
+				DB72906622C83EB1007AB8F7 /* Release.xcconfig */,
+				DB72906722C83EB1007AB8F7 /* Base.xcconfig */,
+			);
+			name = "Xcode-Configurations";
+			path = "../../Xcode-Configurations";
+			sourceTree = "<group>";
+		};
 		E217485C1B911B5200BE234A = {
 			isa = PBXGroup;
 			children = (
 				E217529F1B914B9600BE234A /* Headers */,
 				E2174F2A1B912B6B00BE234A /* Source */,
 				E217515E1B912B8E00BE234A /* Dependencies */,
+				DB72906422C83EB1007AB8F7 /* Xcode-Configurations */,
 				E21748661B911B5200BE234A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -746,6 +776,8 @@
 				E2174F811B912B6B00BE234A /* hash.h */,
 				E2174F821B912B6B00BE234A /* hashsig.c */,
 				E2174F831B912B6B00BE234A /* ident.c */,
+				E2B332B12027906300CD10B3 /* idxmap.c */,
+				E2B332B02027906200CD10B3 /* idxmap.h */,
 				E2174F841B912B6B00BE234A /* ignore.c */,
 				E2174F851B912B6B00BE234A /* ignore.h */,
 				E2174F861B912B6B00BE234A /* index.c */,
@@ -777,11 +809,13 @@
 				E2174F9F1B912B6B00BE234A /* odb_loose.c */,
 				E2174FA01B912B6B00BE234A /* odb_mempack.c */,
 				E2174FA11B912B6B00BE234A /* odb_pack.c */,
+				E2B332B7202790A400CD10B3 /* offmap.c */,
 				E2174FA21B912B6B00BE234A /* offmap.h */,
 				E2174FA31B912B6B00BE234A /* oid.c */,
 				E2174FA41B912B6B00BE234A /* oid.h */,
 				E2174FA51B912B6B00BE234A /* oidarray.c */,
 				E2174FA61B912B6B00BE234A /* oidarray.h */,
+				E2B332B42027908C00CD10B3 /* oidmap.c */,
 				E2174FA71B912B6B00BE234A /* oidmap.h */,
 				E2174FA81B912B6B00BE234A /* openssl_stream.c */,
 				E2174FA91B912B6B00BE234A /* openssl_stream.h */,
@@ -877,6 +911,8 @@
 				E2DC03141E126F6100CC091F /* varint.h */,
 				E217500D1B912B6C00BE234A /* vector.c */,
 				E217500E1B912B6C00BE234A /* vector.h */,
+				E2B332BB202790C000CD10B3 /* worktree.c */,
+				E2B332BA202790C000CD10B3 /* worktree.h */,
 				E217502E1B912B6C00BE234A /* xdiff */,
 				E217503E1B912B6C00BE234A /* zstream.c */,
 				E217503F1B912B6C00BE234A /* zstream.h */,
@@ -888,6 +924,7 @@
 		E2174F791B912B6B00BE234A /* hash */ = {
 			isa = PBXGroup;
 			children = (
+				E2B332BE202790DF00CD10B3 /* hash_collisiondetect.h */,
 				E2174F7A1B912B6B00BE234A /* hash_common_crypto.h */,
 				E2174F7D1B912B6B00BE234A /* hash_openssl.h */,
 			);
@@ -1112,7 +1149,7 @@
 		E217485D1B911B5200BE234A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					E2174BD41B91240400BE234A = {
@@ -1125,9 +1162,10 @@
 			};
 			buildConfigurationList = E21748601B911B5200BE234A /* Build configuration list for PBXProject "libgit2" */;
 			compatibilityVersion = "Xcode 8.0";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				Base,
 				en,
 			);
 			mainGroup = E217485C1B911B5200BE234A;
@@ -1154,6 +1192,7 @@
 				E21750C61B912B6C00BE234A /* pack.c in Sources */,
 				E21750CE1B912B6C00BE234A /* posix.c in Sources */,
 				E217507C1B912B6C00BE234A /* diff_stats.c in Sources */,
+				E2B332B22027906300CD10B3 /* idxmap.c in Sources */,
 				E21751221B912B6C00BE234A /* ssh.c in Sources */,
 				E21750C81B912B6C00BE234A /* path.c in Sources */,
 				E21750F61B912B6C00BE234A /* stash.c in Sources */,
@@ -1219,6 +1258,7 @@
 				E21750A01B912B6C00BE234A /* index.c in Sources */,
 				E21750A21B912B6C00BE234A /* indexer.c in Sources */,
 				E21750861B912B6C00BE234A /* fetchhead.c in Sources */,
+				E2B332BC202790C000CD10B3 /* worktree.c in Sources */,
 				E21750441B912B6C00BE234A /* attr_file.c in Sources */,
 				E21750E01B912B6C00BE234A /* remote.c in Sources */,
 				E21750B61B912B6C00BE234A /* odb.c in Sources */,
@@ -1240,6 +1280,7 @@
 				E21751181B912B6C00BE234A /* http.c in Sources */,
 				E2DC02F91E126E3E00CC091F /* apply.c in Sources */,
 				E2DC03151E126F6100CC091F /* varint.c in Sources */,
+				E2B332B52027908C00CD10B3 /* oidmap.c in Sources */,
 				E21751521B912B6C00BE234A /* xhistogram.c in Sources */,
 				E21750F01B912B6C00BE234A /* signature.c in Sources */,
 				E21750C01B912B6C00BE234A /* oidarray.c in Sources */,
@@ -1270,6 +1311,7 @@
 				E217504A1B912B6C00BE234A /* blame_git.c in Sources */,
 				E21750601B912B6C00BE234A /* config.c in Sources */,
 				E21750761B912B6C00BE234A /* diff_file.c in Sources */,
+				E2B332B8202790A400CD10B3 /* offmap.c in Sources */,
 				E21750921B912B6C00BE234A /* graph.c in Sources */,
 				E21750461B912B6C00BE234A /* attrcache.c in Sources */,
 				E21750FA1B912B6C00BE234A /* stransport_stream.c in Sources */,
@@ -1297,6 +1339,7 @@
 				E21750C71B912B6C00BE234A /* pack.c in Sources */,
 				E21750CF1B912B6C00BE234A /* posix.c in Sources */,
 				E217507D1B912B6C00BE234A /* diff_stats.c in Sources */,
+				E2B332B32027906300CD10B3 /* idxmap.c in Sources */,
 				E21751231B912B6C00BE234A /* ssh.c in Sources */,
 				E21750C91B912B6C00BE234A /* path.c in Sources */,
 				E21750F71B912B6C00BE234A /* stash.c in Sources */,
@@ -1362,6 +1405,7 @@
 				E21750A11B912B6C00BE234A /* index.c in Sources */,
 				E21750A31B912B6C00BE234A /* indexer.c in Sources */,
 				E21750871B912B6C00BE234A /* fetchhead.c in Sources */,
+				E2B332BD202790C000CD10B3 /* worktree.c in Sources */,
 				E21750451B912B6C00BE234A /* attr_file.c in Sources */,
 				E21750E11B912B6C00BE234A /* remote.c in Sources */,
 				E21750B71B912B6C00BE234A /* odb.c in Sources */,
@@ -1383,6 +1427,7 @@
 				E21751191B912B6C00BE234A /* http.c in Sources */,
 				E2DC02FA1E126E3E00CC091F /* apply.c in Sources */,
 				E2DC03161E126F6100CC091F /* varint.c in Sources */,
+				E2B332B62027908C00CD10B3 /* oidmap.c in Sources */,
 				E21751531B912B6C00BE234A /* xhistogram.c in Sources */,
 				E21750F11B912B6C00BE234A /* signature.c in Sources */,
 				E21750C11B912B6C00BE234A /* oidarray.c in Sources */,
@@ -1413,6 +1458,7 @@
 				E217504B1B912B6C00BE234A /* blame_git.c in Sources */,
 				E21750611B912B6C00BE234A /* config.c in Sources */,
 				E21750771B912B6C00BE234A /* diff_file.c in Sources */,
+				E2B332B9202790A400CD10B3 /* offmap.c in Sources */,
 				E21750931B912B6C00BE234A /* graph.c in Sources */,
 				E21750471B912B6C00BE234A /* attrcache.c in Sources */,
 				E21750FB1B912B6C00BE234A /* stransport_stream.c in Sources */,
@@ -1433,21 +1479,30 @@
 /* Begin XCBuildConfiguration section */
 		E217486A1B911B5200BE234A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB72906522C83EB1007AB8F7 /* Debug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_WARN_COMMA = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EXECUTABLE_PREFIX = lib;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"_FILE_OFFSET_BITS=64",
+					HAVE_QSORT_R,
 					GIT_THREADS,
 					GIT_USE_ICONV,
-					GIT_COMMON_CRYPTO,
+					GIT_SHA1_COMMON_CRYPTO,
 					GIT_SECURE_TRANSPORT,
+					GIT_HTTPS,
 					GIT_SSH,
 					GIT_USE_STAT_MTIMESPEC,
+					GIT_USE_NSEC,
+					GIT_ARCH_64,
 				);
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				HEADER_SEARCH_PATHS = (
-					"Libraries/libssh2/$(PLATFORM_NAME)/include",
+					"libssh2/$(GITUP_PLATFORM)/include",
 					libgit2/src,
 					libgit2/include,
 					"libgit2/deps/http-parser",
@@ -1466,26 +1521,36 @@
 					"-Wno-unused-const-variable",
 					"-Wno-incompatible-pointer-types",
 					"-Wno-shorten-64-to-32",
+					"-Wno-format",
 				);
 			};
 			name = Debug;
 		};
 		E217486B1B911B5200BE234A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB72906622C83EB1007AB8F7 /* Release.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_WARN_COMMA = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"_FILE_OFFSET_BITS=64",
+					HAVE_QSORT_R,
 					GIT_THREADS,
 					GIT_USE_ICONV,
-					GIT_COMMON_CRYPTO,
+					GIT_SHA1_COMMON_CRYPTO,
 					GIT_SECURE_TRANSPORT,
+					GIT_HTTPS,
 					GIT_SSH,
 					GIT_USE_STAT_MTIMESPEC,
+					GIT_USE_NSEC,
+					GIT_ARCH_64,
 				);
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				HEADER_SEARCH_PATHS = (
-					"Libraries/libssh2/$(PLATFORM_NAME)/include",
+					"libssh2/$(GITUP_PLATFORM)/include",
 					libgit2/src,
 					libgit2/include,
 					"libgit2/deps/http-parser",
@@ -1503,6 +1568,7 @@
 					"-Wno-unused-const-variable",
 					"-Wno-incompatible-pointer-types",
 					"-Wno-shorten-64-to-32",
+					"-Wno-format",
 				);
 			};
 			name = Release;
@@ -1510,12 +1576,10 @@
 		E2174BD71B91240400BE234A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					GIT_ARCH_64,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1523,12 +1587,10 @@
 		E2174BD81B91240400BE234A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					GIT_ARCH_64,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1536,8 +1598,6 @@
 		E2174C701B9125C600BE234A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1545,8 +1605,6 @@
 		E2174C711B9125C600BE234A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
 			};
 			name = Release;

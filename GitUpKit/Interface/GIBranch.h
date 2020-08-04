@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 @class GINode, GILine;
 
 @interface GIBranch : NSObject
-@property(nonatomic, readonly) GILine* mainLine;  // NOT RETAINED
+@property(nonatomic, weak, readonly) GILine* mainLine;  // NOT RETAINED
 
 // Computed properties
 @property(nonatomic, readonly) GINode* tipNode;

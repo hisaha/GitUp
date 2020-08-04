@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -44,12 +44,12 @@
   repo1 = nil;
 
   // Test read-only
-  XCTAssertTrue([[NSFileManager defaultManager] setAttributes:@{ NSFilePosixPermissions : @(0500) } ofItemAtPath:[path stringByAppendingPathComponent:@".git"] error:NULL]);
+  XCTAssertTrue([[NSFileManager defaultManager] setAttributes:@{NSFilePosixPermissions : @(0500)} ofItemAtPath:[path stringByAppendingPathComponent:@".git"] error:NULL]);
   GCRepository* repo2 = [[GCRepository alloc] initWithExistingLocalRepository:path error:NULL];
   XCTAssertNotNil(repo2);
   XCTAssertTrue(repo2.readOnly);
   repo2 = nil;
-  XCTAssertTrue([[NSFileManager defaultManager] setAttributes:@{ NSFilePosixPermissions : @(0700) } ofItemAtPath:[path stringByAppendingPathComponent:@".git"] error:NULL]);
+  XCTAssertTrue([[NSFileManager defaultManager] setAttributes:@{NSFilePosixPermissions : @(0700)} ofItemAtPath:[path stringByAppendingPathComponent:@".git"] error:NULL]);
 
   // Destroy repository
   XCTAssertTrue([[NSFileManager defaultManager] removeItemAtPath:path error:NULL]);
@@ -62,7 +62,9 @@
 // -initWithNewLocalRepository:bare:error: is called in -setUp
 - (void)testInitialization {
   // Check initialization result
-  [self assertGitCLTOutputContainsString:@"On branch master\n\nInitial commit\n" withRepository:self.repository command:@"status", nil];
+  NSString* result = [self runGitCLTWithRepository:self.repository command:@"status", nil];
+  XCTAssertTrue([result hasPrefix:@"On branch master"]);
+  XCTAssertTrue([result containsString:@"Initial commit"] || [result containsString:@"No commits yet"]);
 
   // Check properties
   XCTAssertEqualObjects([self.repository.repositoryPath stringByStandardizingPath], [self.temporaryPath stringByAppendingPathComponent:@".git"]);

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,6 @@
 @end
 
 @interface GISnapshotListViewController : GIViewController
-@property(nonatomic, assign) id<GISnapshotListViewControllerDelegate> delegate;
+@property(nonatomic, weak) id<GISnapshotListViewControllerDelegate> delegate;
 @property(nonatomic, readonly) GCSnapshot* selectedSnapshot;
 @end

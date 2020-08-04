@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -70,8 +70,8 @@
   self.messageTextView.string = @"";
 }
 
-- (void)viewWillShow {
-  [super viewWillShow];
+- (void)viewWillAppear {
+  [super viewWillAppear];
 
   XLOG_DEBUG_CHECK(self.repository.statusMode == kGCLiveRepositoryStatusMode_Disabled);
   self.repository.statusMode = kGCLiveRepositoryStatusMode_Normal;
@@ -82,8 +82,8 @@
   _indexFilesViewController.selectedDelta = _indexStatus.deltas.firstObject;
 }
 
-- (void)viewDidHide {
-  [super viewDidHide];
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
 
   _workdirStatus = nil;
   _indexStatus = nil;
@@ -255,7 +255,6 @@
                                     button:NSLocalizedString(@"Discard", nil)
                  suppressionUserDefaultKey:nil
                                      block:^{
-
                                        for (GCDiffDelta* delta in deltas) {
                                          NSError* error;
                                          BOOL submodule = delta.submodule;
@@ -269,7 +268,6 @@
                                          _indexActive = YES;
                                          [self.view.window makeFirstResponder:_indexFilesViewController.preferredFirstResponder];
                                        }
-
                                      }];
     } else {
       NSBeep();
@@ -402,7 +400,6 @@
                                     button:NSLocalizedString(@"Discard", nil)
                  suppressionUserDefaultKey:nil
                                      block:^{
-
                                        for (GCDiffDelta* delta in _diffContentsViewController.deltas) {
                                          NSIndexSet* oldLines;
                                          NSIndexSet* newLines;
@@ -419,7 +416,6 @@
                                          _indexActive = !_indexActive;
                                        }
                                        [self.view.window makeFirstResponder:(_indexActive ? _indexFilesViewController.preferredFirstResponder : _workdirFilesViewController.preferredFirstResponder)];
-
                                      }];
     } else {
       NSBeep();

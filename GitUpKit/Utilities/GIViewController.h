@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 @class GIWindowController, GIViewController, GCLiveRepository, GCSnapshot;
 
 @interface GIView : NSView
-@property(nonatomic, readonly) GIViewController* viewController;
+@property(nonatomic, weak, readonly) GIViewController* viewController;
 @end
 
 @interface GIViewController : NSViewController <NSTextFieldDelegate, NSTextViewDelegate, NSTableViewDelegate>
@@ -43,11 +43,6 @@
 
 @interface GIViewController (Subclassing)
 @property(nonatomic, readonly) NSView* preferredFirstResponder;  // Default implementation returns first subview that accepts first responder status
-
-- (void)viewWillShow;  // Default implementation does nothing
-- (void)viewDidShow;  // Default implementation does nothing
-- (void)viewWillHide;  // Default implementation does nothing
-- (void)viewDidHide;  // Default implementation does nothing
 
 - (void)viewDidResize;  // Default implementation does nothing
 - (void)viewWillBeginLiveResize;  // Default implementation does nothing

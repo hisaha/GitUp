@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -116,10 +116,12 @@ static NSMutableDictionary* _patternHelp = nil;
   CGFloat fontSize = _cachedCellView.optionTextField.font.pointSize;
   _optionAttributes = @{NSFontAttributeName : [NSFont boldSystemFontOfSize:fontSize]};
   _separatorAttributes = @{NSFontAttributeName : [NSFont systemFontOfSize:fontSize]};
-  _valueAttributes = @{NSFontAttributeName : [NSFont systemFontOfSize:fontSize], NSBackgroundColorAttributeName : [NSColor colorWithDeviceRed:1.0 green:1.0 blue:0.0 alpha:0.5]};
+  _valueAttributes = @{NSFontAttributeName : [NSFont systemFontOfSize:fontSize], NSBackgroundColorAttributeName : NSColor.gitUpConfigHighlightBackgroundColor};
 }
 
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   [self _reloadConfig];
 }
 
@@ -138,7 +140,9 @@ static NSMutableDictionary* _patternHelp = nil;
   }
 }
 
-- (void)viewDidHide {
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
+
   _config = nil;
   _set = nil;
   [_tableView reloadData];
@@ -209,11 +213,11 @@ static NSMutableDictionary* _patternHelp = nil;
 - (void)tableView:(NSTableView*)tableView didAddRowView:(NSTableRowView*)rowView forRow:(NSInteger)row {
   GCConfigOption* option = _config[row];
   if ([_set countForObject:option.variable] > 1) {
-    rowView.backgroundColor = [NSColor colorWithDeviceRed:1.0 green:0.95 blue:0.95 alpha:1.0];
+    rowView.backgroundColor = NSColor.gitUpConfigConflictBackgroundColor;
   } else if (option.level != kGCConfigLevel_Local) {
-    rowView.backgroundColor = [NSColor colorWithDeviceRed:0.95 green:1.0 blue:0.95 alpha:1.0];
+    rowView.backgroundColor = NSColor.gitUpConfigGlobalBackgroundColor;
   } else {
-    rowView.backgroundColor = [NSColor whiteColor];
+    rowView.backgroundColor = NSColor.textBackgroundColor;
   }
 }
 
@@ -306,35 +310,32 @@ static NSMutableDictionary* _patternHelp = nil;
 - (void)_promptOption:(GCConfigOption*)option {
   _nameTextField.stringValue = option ? option.variable : @"";
   _valueTextField.stringValue = option ? option.value : @"";
-  _nameTextField.editable = (option == nil);
-  _nameTextField.textColor = option ? [NSColor grayColor] : _valueTextField.textColor;
+  _nameTextField.enabled = (option == nil);
   [self.windowController runModalView:_editView
             withInitialFirstResponder:(option ? _valueTextField : _nameTextField)
-                    completionHandler:^(BOOL success) {
+            completionHandler:^(BOOL success) {
+              if (success) {
+                NSString* name = option ? option.variable : [_nameTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                NSString* value = [_valueTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                if (name.length && value.length) {
+                  NSError* error;
+                  GCConfigOption* currentOption = option ? option : [self.repository readConfigOptionForLevel:kGCConfigLevel_Local variable:name error:&error];
+                  if ((currentOption || ([error.domain isEqualToString:GCErrorDomain] && (error.code == kGCErrorCode_NotFound))) && [self.repository writeConfigOptionForLevel:(option ? option.level : kGCConfigLevel_Local) variable:name withValue:value error:&error]) {
+                    [self.undoManager setActionName:NSLocalizedString(@"Edit Configuration", nil)];
+                    [[self.undoManager prepareWithInvocationTarget:self] _undoWriteOptionWithLevel:(option ? option.level : kGCConfigLevel_Local) variable:name value:currentOption.value ignore:NO];  // TODO: We should really use the built-in undo mechanism from GCLiveRepository
+                    [self.repository notifyRepositoryChanged];
 
-                      if (success) {
-                        NSString* name = option ? option.variable : [_nameTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                        NSString* value = [_valueTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                        if (name.length && value.length) {
-                          NSError* error;
-                          GCConfigOption* currentOption = option ? option : [self.repository readConfigOptionForLevel:kGCConfigLevel_Local variable:name error:&error];
-                          if ((currentOption || ([error.domain isEqualToString:GCErrorDomain] && (error.code == kGCErrorCode_NotFound))) && [self.repository writeConfigOptionForLevel:(option ? option.level : kGCConfigLevel_Local) variable:name withValue:value error:&error]) {
-                            [self.undoManager setActionName:NSLocalizedString(@"Edit Configuration", nil)];
-                            [[self.undoManager prepareWithInvocationTarget:self] _undoWriteOptionWithLevel:(option ? option.level : kGCConfigLevel_Local) variable:name value:currentOption.value ignore:NO];  // TODO: We should really use the built-in undo mechanism from GCLiveRepository
-                            [self.repository notifyRepositoryChanged];
-
-                            if (!option) {
-                              [self _selectOptionWithLevel:kGCConfigLevel_Local variable:name];
-                            }
-                          } else {
-                            [self presentError:error];
-                          }
-                        } else {
-                          NSBeep();
-                        }
-                      }
-
-                    }];
+                    if (!option) {
+                      [self _selectOptionWithLevel:kGCConfigLevel_Local variable:name];
+                    }
+                  } else {
+                    [self presentError:error];
+                  }
+                } else {
+                  NSBeep();
+                }
+              }
+            }];
 }
 
 - (IBAction)addOption:(id)sender {

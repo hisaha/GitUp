@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,20 +40,10 @@
 @implementation GIReflogCellView
 @end
 
-static NSColor* _missingColor = nil;
-static NSColor* _unreachableColor = nil;
-static NSColor* _reachableColor = nil;
-
 @implementation GIUnifiedReflogViewController {
   NSArray* _entries;
   NSDateFormatter* _dateFormatter;
   GIReflogCellView* _cachedCellView;
-}
-
-+ (void)initialize {
-  _missingColor = [NSColor colorWithDeviceRed:1.0 green:0.0 blue:0.0 alpha:1.0];
-  _unreachableColor = [NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:1.0];
-  _reachableColor = [NSColor colorWithDeviceRed:0.7 green:0.7 blue:0.7 alpha:1.0];
 }
 
 - (instancetype)initWithRepository:(GCLiveRepository*)repository {
@@ -74,7 +64,9 @@ static NSColor* _reachableColor = nil;
   _cachedCellView = [_tableView makeViewWithIdentifier:[_tableView.tableColumns[0] identifier] owner:self];
 }
 
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   [self _reloadUnifiedReflog];
 }
 
@@ -109,7 +101,9 @@ static NSColor* _reachableColor = nil;
   }
 }
 
-- (void)viewDidHide {
+- (void)viewDidDisappear {
+  [super viewDidDisappear];
+
   _entries = nil;
   [_tableView reloadData];
 }
@@ -205,14 +199,14 @@ static NSString* _StringFromActions(GCReflogActions actions) {
   if (commit) {
     if ([self.repository.history historyCommitForCommit:entry.toCommit]) {
       view.mode = 1;
-      color = _reachableColor;
+      color = NSColor.secondaryLabelColor;
     } else {
       view.mode = 0;
-      color = _unreachableColor;
+      color = NSColor.labelColor;
     }
   } else {
     view.mode = -1;
-    color = _missingColor;
+    color = NSColor.systemRedColor;
   }
   view.dateTextField.stringValue = [_dateFormatter stringFromDate:entry.date];
   view.dateTextField.textColor = color;
@@ -279,7 +273,6 @@ static NSString* _StringFromActions(GCReflogActions actions) {
   [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
   [self presentAlert:alert
       completionHandler:^(NSInteger returnCode) {
-
         if (returnCode == NSAlertFirstButtonReturn) {
           NSString* name = [_nameTextField.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
           if (name.length) {
@@ -292,7 +285,6 @@ static NSString* _StringFromActions(GCReflogActions actions) {
                                                  skipCheckoutOnUndo:NO
                                                               error:&error
                                                          usingBlock:^BOOL(GCLiveRepository* repository, NSError** outError) {
-
                                                            GCLocalBranch* branch = [repository createLocalBranchFromCommit:entry.toCommit withName:name force:NO error:outError];
                                                            if (branch == nil) {
                                                              return NO;
@@ -302,7 +294,6 @@ static NSString* _StringFromActions(GCReflogActions actions) {
                                                              return NO;
                                                            }
                                                            return YES;
-
                                                          }];
             }
             if (success) {
@@ -316,7 +307,6 @@ static NSString* _StringFromActions(GCReflogActions actions) {
             NSBeep();
           }
         }
-
       }];
 }
 

@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,43 +26,12 @@
 #import "XLFacilityMacros.h"
 
 @interface GIView ()
-@property(nonatomic, assign) GIViewController* viewController;
+@property(nonatomic, weak) GIViewController* viewController;
 @end
 
 #define OVERRIDES_METHOD(m) (method_getImplementation(class_getInstanceMethod(self.class, @selector(m))) != method_getImplementation(class_getInstanceMethod([GIViewController class], @selector(m))))
 
-@implementation GIView {
-  __unsafe_unretained GIViewController* _viewController;  // This is required since redeclaring a read-only property as "assign" still makes it strong!
-}
-
-- (void)viewWillMoveToWindow:(NSWindow*)newWindow {
-  [super viewWillMoveToWindow:newWindow];
-
-  if (newWindow) {
-    [_viewController viewWillShow];
-  } else {
-    [_viewController viewWillHide];
-  }
-}
-
-- (void)viewDidMoveToWindow {
-  [super viewDidMoveToWindow];
-
-  if (self.window) {
-    [_viewController viewDidShow];
-  } else {
-    [_viewController viewDidHide];
-  }
-}
-
-- (void)setViewController:(GIViewController*)viewController {
-  _viewController = viewController;
-  [super setNextResponder:_viewController];
-}
-
-- (void)setNextResponder:(NSResponder*)nextResponder {
-  [_viewController setNextResponder:nextResponder];
-}
+@implementation GIView
 
 - (void)resizeSubviewsWithOldSize:(NSSize)oldSize {
   [super resizeSubviewsWithOldSize:oldSize];
@@ -183,7 +152,7 @@
 }
 
 - (void)presentAlert:(NSAlert*)alert completionHandler:(void (^)(NSInteger returnCode))handler {
-  [alert beginSheetModalForWindow:self.view.window withCompletionHandler:handler];
+  [alert beginSheetModalForWindow:self.view.window completionHandler:handler];
 }
 
 #pragma mark - NSTextFieldDelegate
@@ -237,18 +206,16 @@
   if (format) {
     va_list arguments;
     va_start(arguments, format);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
     message = [[NSString alloc] initWithFormat:format arguments:arguments];
-#pragma clang diagnostic pop
     va_end(arguments);
   }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-security"
-  NSAlert* alert = [NSAlert alertWithMessageText:title defaultButton:NSLocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:(message ? message : @"")];
-#pragma clang diagnostic pop
+
+  NSAlert* alert = [[NSAlert alloc] init];
+  alert.messageText = title;
+  alert.informativeText = (message ? message : @"");
+  [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
   alert.type = type;
-  [self presentAlert:alert completionHandler:NULL];
+  [alert beginSheetModalForWindow:self.view.window completionHandler:NULL];
 }
 
 - (void)confirmUserActionWithAlertType:(GIAlertType)type
@@ -272,14 +239,12 @@
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
     [self presentAlert:alert
         completionHandler:^(NSInteger returnCode) {
-
           if (returnCode == NSAlertFirstButtonReturn) {
             block();
           }
           if (alert.suppressionButton.state) {
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:key];
           }
-
         }];
   }
 }
@@ -313,22 +278,6 @@ static NSView* _PreferredFirstResponder(NSView* containerView) {
   NSView* view = _PreferredFirstResponder(self.view);
   XLOG_DEBUG_CHECK(view);
   return view;
-}
-
-- (void)viewWillShow {
-  ;
-}
-
-- (void)viewDidShow {
-  ;
-}
-
-- (void)viewWillHide {
-  ;
-}
-
-- (void)viewDidHide {
-  ;
 }
 
 - (void)viewDidResize {

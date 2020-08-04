@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ extern NSString* const GCLiveRepositoryAmendOperationReason;
 #if DEBUG
 + (NSUInteger)allocatedCount;  // For debugging only
 #endif
-@property(nonatomic, assign) id<GCLiveRepositoryDelegate> delegate;
+@property(nonatomic, weak) id<GCLiveRepositoryDelegate> delegate;
 
 - (void)notifyRepositoryChanged;  // Calling this method is required when manipulating the repository from this process as live-updates don't apply
 - (void)notifyWorkingDirectoryChanged;  // Calling this method is required when manipulating the working directory from this process as live-updates don't apply

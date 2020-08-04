@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -247,7 +247,6 @@ extern int git_submodule_foreach_block(git_repository* repo, int (^block)(git_su
 @property(nonatomic, readonly) git_repository* private NS_RETURNS_INNER_POINTER;
 @property(nonatomic, readonly) NSUInteger lastUpdatedTips;  // Reset before fetching and updated during fetching
 - (instancetype)initWithRepository:(git_repository*)repository error:(NSError**)error;
-- (void)updateRepository:(git_repository*)repository;
 - (NSString*)privateTemporaryFilePath;
 #if DEBUG
 - (GCDiff*)checkUnifiedStatus:(NSError**)error;
@@ -316,7 +315,7 @@ extern int git_submodule_foreach_block(git_repository* repo, int (^block)(git_su
 @end
 
 @interface GCRepository (GCReference_Private)
-- (id)findReferenceWithFullName:(NSString*)fullname class:(Class) class error:(NSError**)error;
+- (id)findReferenceWithFullName:(NSString*)fullname class:(Class)class error:(NSError**)error;
 - (BOOL)refreshReference:(GCReference*)reference error:(NSError**)error;
 - (BOOL)enumerateReferencesWithOptions:(GCReferenceEnumerationOptions)options error:(NSError**)error usingBlock:(BOOL (^)(git_reference* reference))block;
 - (BOOL)loadTargetOID:(git_oid*)oid fromReference:(git_reference*)reference error:(NSError**)error;

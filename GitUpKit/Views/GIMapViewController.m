@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@
 
 #import "GIWindowController.h"
 #import "GIInterface.h"
+#import "GCLiveRepository+Utilities.h"
 #import "GCRepository+Utilities.h"
 #import "GCHistory+Rewrite.h"
 #import "XLFacilityMacros.h"
+#import "NSBundle+GitUpKit.h"
 
 #define kPersistentViewStateKeyNamespace @"GIMapViewController_"
 
@@ -85,18 +87,12 @@ typedef NS_ENUM(NSInteger, GIGitFlowAction) {
 @property(nonatomic, weak) IBOutlet NSButton* messageButton;
 @end
 
-static NSColor* _patternColor = nil;
-
 @implementation GIMapViewController {
   BOOL _showsVirtualTips;
   BOOL _hidesTagTips;
   BOOL _hidesRemoteBranchTips;
   BOOL _hidesStaleBranchTips;
   BOOL _updatePending;
-}
-
-+ (void)initialize {
-  _patternColor = [NSColor colorWithPatternImage:[[NSBundle bundleForClass:[GIMapViewController class]] imageForResource:@"background_pattern"]];
 }
 
 - (instancetype)initWithRepository:(GCLiveRepository*)repository {
@@ -111,11 +107,12 @@ static NSColor* _patternColor = nil;
 
 - (void)_setGraphViewBackgroundColors:(BOOL)previewMode {
   if (previewMode) {
-    _graphView.backgroundColor = _patternColor;
+    NSBundle* bundle = NSBundle.gitUpKitBundle;
+    NSImage* patternImage = [bundle imageForResource:@"background_pattern"];
+    _graphScrollView.backgroundColor = [NSColor colorWithPatternImage:patternImage];
   } else {
-    _graphView.backgroundColor = [NSColor whiteColor];
+    _graphScrollView.backgroundColor = NSColor.controlBackgroundColor;
   }
-  _graphScrollView.backgroundColor = _graphView.backgroundColor;  // Required for exposed areas through elasticity
 }
 
 - (void)loadView {
@@ -129,7 +126,9 @@ static NSColor* _patternColor = nil;
   _updatePending = YES;
 }
 
-- (void)viewWillShow {
+- (void)viewWillAppear {
+  [super viewWillAppear];
+
   if (_updatePending) {
     [self _reloadMap:NO];
     _updatePending = NO;
@@ -592,19 +591,6 @@ static NSColor* _patternColor = nil;
   }
 }
 
-- (id)_smartCheckoutTarget:(GCHistoryCommit*)commit {
-  NSArray* branches = commit.localBranches;
-  if (branches.count > 1) {
-    GCHistoryLocalBranch* headBranch = self.repository.history.HEADBranch;
-    NSUInteger index = [branches indexOfObject:headBranch];
-    if (index != NSNotFound) {
-      return [branches objectAtIndex:((index + 1) % branches.count)];
-    }
-  }
-  GCHistoryLocalBranch* branch = branches.firstObject;
-  return branch ? branch : commit;
-}
-
 - (void)_promptForCommitMessage:(NSString*)message withTitle:(NSString*)title button:(NSString*)button block:(void (^)(NSString* message))block {
   _messageTextField.stringValue = title;
   _messageTextView.string = message;
@@ -613,7 +599,6 @@ static NSColor* _patternColor = nil;
   [self.windowController runModalView:_messageView
             withInitialFirstResponder:_messageTextView
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* editedMessage = [_messageTextView.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                         if (editedMessage.length) {
@@ -624,7 +609,6 @@ static NSColor* _patternColor = nil;
                       }
                       _messageTextView.string = @"";
                       [_messageTextView.undoManager removeAllActions];
-
                     }];
 }
 
@@ -776,7 +760,7 @@ static NSColor* _patternColor = nil;
   }
   
   if (item.action == @selector(checkoutSelectedCommit:)) {
-    id target = [self _smartCheckoutTarget:commit];
+    id target = [self.repository smartCheckoutTarget:commit];
     if ([target isKindOfClass:[GCLocalBranch class]]) {
       _checkoutMenuItem.title = [NSString stringWithFormat:NSLocalizedString(@"Checkout \"%@\" Branch", nil), [target name]];
       return ![self.repository.history.HEADBranch isEqualToBranch:target];
@@ -1088,7 +1072,7 @@ static NSColor* _patternColor = nil;
     [self showGitFlowError: @"Master branch not found."];
     return NO;
   }
-  [self checkoutLocalBranch:branch];
+  [self.repository checkoutLocalBranch:branch options:(kGCCheckoutOption_UpdateSubmodulesRecursively | kGCCheckoutOption_Force) error:&error];
   if ([self gitFlowMergeBranch:currentBranch intoBranch:branch] == NO) { return NO; }
   if (result != NULL) { *result = branch; }
   return YES;
@@ -1212,32 +1196,7 @@ static NSColor* _patternColor = nil;
 
 - (IBAction)checkoutSelectedCommit:(id)sender {
   GCHistoryCommit* commit = _graphView.selectedCommit;
-  id target = [self _smartCheckoutTarget:commit];
-  if ([target isKindOfClass:[GCLocalBranch class]]) {
-    [self checkoutLocalBranch:target];
-  } else {
-    GCHistoryRemoteBranch* branch = commit.remoteBranches.firstObject;
-    if (branch && ![self.repository.history historyLocalBranchWithName:branch.branchName]) {
-      NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"Do you want to just checkout the commit or also create a new local branch?", nil)
-                                       defaultButton:NSLocalizedString(@"Create Local Branch", nil)
-                                     alternateButton:NSLocalizedString(@"Cancel", nil)
-                                         otherButton:NSLocalizedString(@"Checkout Commit", nil)
-                           informativeTextWithFormat:NSLocalizedString(@"The selected commit is also the tip of the remote branch \"%@\".", nil), branch.name];
-      alert.type = kGIAlertType_Note;
-      [self presentAlert:alert
-          completionHandler:^(NSInteger returnCode) {
-
-            if (returnCode == NSAlertDefaultReturn) {
-              [self checkoutRemoteBranch:branch];
-            } else if (returnCode == NSAlertOtherReturn) {
-              [self checkoutCommit:target];
-            }
-
-          }];
-    } else {
-      [self checkoutCommit:target];
-    }
-  }
+  [self.repository smartCheckoutCommit:commit window:self.view.window];
 }
 
 - (IBAction)createTagAtSelectedCommit:(id)sender {
@@ -1247,7 +1206,6 @@ static NSColor* _patternColor = nil;
   [self.windowController runModalView:_tagView
             withInitialFirstResponder:_tagNameTextField
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* name = _tagNameTextField.stringValue;
                         NSString* message = [_tagMessageTextView.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1259,7 +1217,6 @@ static NSColor* _patternColor = nil;
                       }
                       _tagMessageTextView.string = @"";
                       [_tagMessageTextView.undoManager removeAllActions];
-
                     }];
 }
 
@@ -1267,6 +1224,11 @@ static NSColor* _patternColor = nil;
 - (IBAction)editSelectedCommitMessage:(id)sender {
   GCHistoryCommit* commit = self.graphView.selectedNode.commit;
   [self editCommitMessage:commit];
+}
+
+- (IBAction)copySelectedCommitMessage:(id)sender {
+  GCHistoryCommit* commit = self.graphView.selectedNode.commit;
+  [self copyCommitMessage:commit];
 }
 
 - (IBAction)rewriteSelectedCommit:(id)sender {
@@ -1288,25 +1250,39 @@ static NSColor* _patternColor = nil;
   [self revertCommit:commit againstLocalBranch:self.repository.history.HEADBranch];
 }
 
+- (GCHistoryLocalBranch*)branchToDeleteForSelectedCommit:(GCHistoryCommit*)commit {
+  NSArray<GCHistoryLocalBranch*>* localBranches = commit.localBranches;
+  NSString* headBranchName = self.repository.history.HEADBranch.name;
+
+  NSInteger index = [localBranches indexOfObjectPassingTest:^BOOL(GCHistoryLocalBranch* _Nonnull obj, NSUInteger idx, BOOL* _Nonnull stop) {
+    return ![headBranchName isEqualToString:obj.name];
+  }];
+
+  if (index == NSNotFound) {
+    return localBranches.firstObject;
+  }
+
+  return localBranches[index];
+}
+
 - (IBAction)deleteSelectedCommit:(id)sender {
   GCHistoryCommit* commit = _graphView.selectedCommit;
-  GCHistoryLocalBranch* localBranch = commit.localBranches.firstObject;
+  GCHistoryLocalBranch* localBranch = [self branchToDeleteForSelectedCommit:commit];
   if (localBranch) {
-    NSAlert* alert = [NSAlert alertWithMessageText:NSLocalizedString(@"Do you want to delete the commit or the local branch?", nil)
-                                     defaultButton:NSLocalizedString(@"Delete Local Branch", nil)
-                                   alternateButton:NSLocalizedString(@"Cancel", nil)
-                                       otherButton:NSLocalizedString(@"Delete Commit", nil)
-                         informativeTextWithFormat:NSLocalizedString(@"The selected commit is also the tip of the local branch \"%@\".", nil), localBranch.name];
+    NSAlert* alert = [[NSAlert alloc] init];
+    alert.messageText = NSLocalizedString(@"Do you want to delete the commit or the local branch?", nil);
+    alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"The selected commit is also the tip of the local branch \"%@\".", nil), localBranch.name];
+    [alert addButtonWithTitle:NSLocalizedString(@"Delete Local Branch", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Delete Commit", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
     alert.type = kGIAlertType_Note;
     [self presentAlert:alert
         completionHandler:^(NSInteger returnCode) {
-
-          if (returnCode == NSAlertDefaultReturn) {
+          if (returnCode == NSAlertFirstButtonReturn) {
             [self deleteLocalBranch:localBranch];
-          } else if (returnCode == NSAlertOtherReturn) {
+          } else if (returnCode == NSAlertSecondButtonReturn) {
             [self deleteCommit:commit];
           }
-
         }];
   } else {
     GCHistoryRemoteBranch* remoteBranch = commit.remoteBranches.firstObject;
@@ -1374,7 +1350,6 @@ static NSColor* _patternColor = nil;
   [self.windowController runModalView:_createBranchView
             withInitialFirstResponder:_createBranchTextField
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* name = _createBranchTextField.stringValue;
                         if (name.length) {
@@ -1383,7 +1358,6 @@ static NSColor* _patternColor = nil;
                           NSBeep();
                         }
                       }
-
                     }];
 }
 
@@ -1395,7 +1369,6 @@ static NSColor* _patternColor = nil;
   [self.windowController runModalView:_renameTagView
             withInitialFirstResponder:_renameTagTextField
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* name = _renameTagTextField.stringValue;
                         if (name.length && ![name isEqualToString:tag.name]) {
@@ -1404,7 +1377,6 @@ static NSColor* _patternColor = nil;
                           NSBeep();
                         }
                       }
-
                     }];
 }
 
@@ -1426,7 +1398,7 @@ static NSColor* _patternColor = nil;
 
 - (IBAction)_checkoutRemoteBranch:(id)sender {
   GCHistoryRemoteBranch* branch = [(NSMenuItem*)sender representedObject];
-  [self checkoutRemoteBranch:branch];
+  [self.repository checkoutRemoteBranch:branch window:self.view.window];
 }
 
 - (IBAction)_fetchRemoteBranch:(id)sender {
@@ -1471,7 +1443,6 @@ static NSColor* _patternColor = nil;
   [self.windowController runModalView:_renameBranchView
             withInitialFirstResponder:_renameBranchTextField
                     completionHandler:^(BOOL success) {
-
                       if (success) {
                         NSString* name = _renameBranchTextField.stringValue;
                         if (name.length && ![name isEqualToString:branch.name]) {
@@ -1480,7 +1451,6 @@ static NSColor* _patternColor = nil;
                           NSBeep();
                         }
                       }
-
                     }];
 }
 

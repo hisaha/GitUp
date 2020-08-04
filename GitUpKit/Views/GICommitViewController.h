@@ -1,4 +1,4 @@
-//  Copyright (C) 2015-2017 Pierre-Olivier Latour <info@pol-online.net>
+//  Copyright (C) 2015-2019 Pierre-Olivier Latour <info@pol-online.net>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 // Abstract base class
 @interface GICommitViewController : GIViewController
-@property(nonatomic, assign) id<GICommitViewControllerDelegate> delegate;
+@property(nonatomic, weak) id<GICommitViewControllerDelegate> delegate;
 @property(nonatomic, weak) IBOutlet NSTextField* infoTextField;
 @property(nonatomic, strong) IBOutlet GICommitMessageView* messageTextView;  // Does not support weak references
 @property(nonatomic, strong) IBOutlet GICommitMessageView* otherMessageTextView;  // Does not support weak references
